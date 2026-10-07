@@ -1,5 +1,10 @@
 {
   "metadata": {
+    "system": "Warehouse Sentinel",
+    "subsystems": [
+      "Member 1 (YOLO11 + ByteTrack)",
+      "Member 2 (Behavior Intelligence)"
+    ],
     "video_source": "D:\\chud\\autonomous-vision\\data\\input\\multi_person.mp4",
     "tracker": "ByteTrack",
     "model": "yolo11n.pt",
@@ -7,7 +12,8 @@
     "height": 480,
     "fps": 10.0,
     "total_frames": 20,
-    "behavior_engine_enabled": true
+    "elapsed_seconds": 2.8,
+    "processing_fps": 7.14
   },
   "summary": {
     "total_records": 69,
@@ -18,8 +24,81 @@
       3,
       4
     ],
-    "behavior_events_count": 4
+    "total_safety_events": 4,
+    "activity_distribution": {
+      "STANDING": 27,
+      "WALKING": 35,
+      "RUNNING": 7
+    },
+    "status_distribution": {
+      "NORMAL": 69,
+      "POTENTIALLY_UNUSUAL": 0,
+      "ABNORMAL": 0,
+      "UNKNOWN": 0
+    }
   },
+  "events": [
+    {
+      "type": "ACTIVITY_CHANGE",
+      "track_id": 2,
+      "timestamp": 0.5,
+      "confidence": 0.8875,
+      "severity": "LOW",
+      "reason": [
+        "Transitioned from STANDING to WALKING"
+      ],
+      "details": {
+        "from_activity": "STANDING",
+        "to_activity": "WALKING",
+        "previous_duration": 0.0
+      }
+    },
+    {
+      "type": "ACTIVITY_CHANGE",
+      "track_id": 3,
+      "timestamp": 0.5,
+      "confidence": 0.8721,
+      "severity": "LOW",
+      "reason": [
+        "Transitioned from STANDING to WALKING"
+      ],
+      "details": {
+        "from_activity": "STANDING",
+        "to_activity": "WALKING",
+        "previous_duration": 0.0
+      }
+    },
+    {
+      "type": "ACTIVITY_CHANGE",
+      "track_id": 1,
+      "timestamp": 0.8,
+      "confidence": 0.8094,
+      "severity": "LOW",
+      "reason": [
+        "Transitioned from STANDING to WALKING"
+      ],
+      "details": {
+        "from_activity": "STANDING",
+        "to_activity": "WALKING",
+        "previous_duration": 0.0
+      }
+    },
+    {
+      "type": "ACTIVITY_CHANGE",
+      "track_id": 3,
+      "timestamp": 1.3,
+      "confidence": 0.7574,
+      "severity": "LOW",
+      "reason": [
+        "Transitioned from WALKING to RUNNING"
+      ],
+      "details": {
+        "from_activity": "WALKING",
+        "to_activity": "RUNNING",
+        "previous_duration": 0.0
+      }
+    }
+  ],
   "tracks": [
     {
       "track_id": 1,
@@ -2368,68 +2447,6 @@
         "duration": 0.6,
         "transition": null,
         "event": null
-      }
-    }
-  ],
-  "behavior_events": [
-    {
-      "type": "ACTIVITY_CHANGE",
-      "track_id": 2,
-      "timestamp": 0.5,
-      "confidence": 0.8875,
-      "severity": "LOW",
-      "reason": [
-        "Transitioned from STANDING to WALKING"
-      ],
-      "details": {
-        "from_activity": "STANDING",
-        "to_activity": "WALKING",
-        "previous_duration": 0.0
-      }
-    },
-    {
-      "type": "ACTIVITY_CHANGE",
-      "track_id": 3,
-      "timestamp": 0.5,
-      "confidence": 0.8721,
-      "severity": "LOW",
-      "reason": [
-        "Transitioned from STANDING to WALKING"
-      ],
-      "details": {
-        "from_activity": "STANDING",
-        "to_activity": "WALKING",
-        "previous_duration": 0.0
-      }
-    },
-    {
-      "type": "ACTIVITY_CHANGE",
-      "track_id": 1,
-      "timestamp": 0.8,
-      "confidence": 0.8094,
-      "severity": "LOW",
-      "reason": [
-        "Transitioned from STANDING to WALKING"
-      ],
-      "details": {
-        "from_activity": "STANDING",
-        "to_activity": "WALKING",
-        "previous_duration": 0.0
-      }
-    },
-    {
-      "type": "ACTIVITY_CHANGE",
-      "track_id": 3,
-      "timestamp": 1.3,
-      "confidence": 0.7574,
-      "severity": "LOW",
-      "reason": [
-        "Transitioned from WALKING to RUNNING"
-      ],
-      "details": {
-        "from_activity": "WALKING",
-        "to_activity": "RUNNING",
-        "previous_duration": 0.0
       }
     }
   ]
