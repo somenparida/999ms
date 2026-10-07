@@ -1,0 +1,114 @@
+# ==============================================================================
+# Warehouse Sentinel - Behavior Intelligence Engine Configuration
+# ==============================================================================
+# IMPORTANT NOTE ON CAMERA DEPENDENCY:
+# Pixel-based velocity and displacement thresholds depend on camera viewpoint,
+# mounting height, focal length, angle, and video resolution.
+# These thresholds represent defaults for standard 1080p surveillance video
+# viewing human subjects at typical warehouse distances (~5 to 25 meters).
+# Camera calibration / homography projection should be applied upstream if
+# metric speed (m/s or km/h) is required.
+# ==============================================================================
+
+history:
+  # Maximum duration in seconds of historical trajectory to retain per track
+  max_seconds: 5.0
+  # Automatically remove track buffers if no update received for this long
+  stale_track_seconds: 2.0
+  # Hard cap on number of frames stored per track to prevent unbounded memory
+  max_frames: 150
+
+motion:
+  # Pixel velocity thresholds (pixels / second in image plane)
+  standing:
+    max_velocity: 8.0          # Below this is considered stationary/standing
+
+  walking:
+    min_velocity: 6.0          # Minimum velocity to classify as walking
+    max_velocity: 28.0         # Upper limit before walking transitions to running
+
+  running:
+    min_velocity: 26.0         # Above this is classified as running
+    min_acceleration: 15.0     # Running typically has noticeable acceleration bursts
+
+  # Motion variance and stability
+  stationary_variance_max: 12.0
+
+  # Prolonged inactivity threshold (seconds) - triggers PROLONGED_INACTIVITY event
+  prolonged_inactivity_seconds: 60.0
+
+pose:
+  # Minimum confidence required for individual keypoint validity (0.0 - 1.0)
+  min_keypoint_confidence: 0.35
+  # Minimum ratio of valid keypoints required to trust pose analysis
+  min_valid_keypoint_ratio: 0.40
+
+  # Bounding box aspect ratio (width / height)
+  # Upright human typical aspect ratio is ~0.35 to 0.60
+  # Lying human typical aspect ratio is ~1.2 to 2.5
+  lying_aspect_ratio_min: 1.15
+  standing_aspect_ratio_max: 0.75
+
+  # Joint and torso angles (in degrees)
+  # Torso angle deviation from vertical:
+  # 0 deg = perfectly upright, 90 deg = horizontal
+  torso_upright_max_deg: 35.0
+  torso_horizontal_min_deg: 60.0
+
+  # Sitting detection angles:
+  # Hip-knee-ankle knee flexion angle:
+  # Straight leg ~ 180 deg, sitting bent knee ~ 70 - 130 deg
+  sitting_knee_angle_max: 135.0
+  sitting_hip_knee_dy_ratio: 0.45   # Relative vertical drop from hip to knee
+
+  # Crouching / Squatting detection:
+  # Deep knee flexion with hips lowered close to ankles
+  crouching_knee_angle_max: 115.0
+  crouching_hip_ankle_dy_ratio: 0.35
+
+  # Bending / Stooping detection:
+  # Torso tilted forward at waist with straight legs
+  bending_torso_angle_min: 35.0
+  bending_torso_angle_max: 75.0
+  bending_knee_angle_min: 130.0
+
+smoothing:
+  # Size of temporal smoothing window (in frames)
+  window_size: 7
+  # Minimum duration (seconds) required in a new activity before committing state transition
+  min_duration_seconds: 0.40
+  # Decay weight for older predictions in the smoothing window (recency weighting)
+  recency_weight_decay: 0.85
+
+fall_detection:
+  # Fall sequence evaluation window (seconds)
+  detection_window_seconds: 2.5
+
+  # Kinematic thresholds during fall phase
+  min_downward_velocity: 40.0       # Rapid downward pixel displacement rate (px/s)
+  min_downward_acceleration: 30.0   # Downward acceleration peak during fall
+  posture_change_ratio_min: 1.40    # Rapid change in aspect ratio or vertical extent collapse
+
+  # Post-fall stabilization
+  post_fall_velocity_max: 8.0       # Person must remain relatively stationary after impact
+  post_fall_duration_min: 0.6       # Minimum seconds of low movement after impact
+
+  # Composite score weighting (must sum to 1.0)
+  weights:
+    vertical_motion: 0.35
+    posture_change: 0.25
+    acceleration: 0.20
+    post_fall_stability: 0.20
+
+  # Trigger confidence thresholds
+  possible_fall_threshold: 0.60
+  fall_detected_threshold: 0.82
+
+  # Cooldown period (seconds) before reporting another fall for the same track
+  cooldown_seconds: 5.0
+
+classifier:
+  # Detection confidence threshold below which behavior becomes UNKNOWN
+  min_detection_confidence: 0.45
+  # Activity prediction confidence discount when pose is missing (motion-only)
+  missing_pose_confidence_penalty: 0.15
