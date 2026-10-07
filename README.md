@@ -67,9 +67,26 @@ AUTOVISION integrates multi-person detection, trajectory tracking, explainable b
 
 ---
 
-## 📸 Visual Tour of the Application
+## 📸 Visual Tour & System Screenshots
 
-### 1. Security & Behavioral Telemetry Dashboard
+All application screenshots and pipeline artifacts are organized inside the [`screenshots/`](screenshots/) directory.
+
+### 1. Video Intelligence Workspace & Live HUD Overlays
+The primary operational workspace featuring live video playback, YOLOv8/11 entity bounding box rendering, interactive safety zone polygons, seekable incident timeline with event markers, and toolbar buttons for Member 1 & Member 2 AI pipeline ingestion.
+
+![Video Intelligence Workspace](screenshots/video_analysis_workspace.png)
+
+- **Route**: `/analysis`
+- **Key Features**:
+  - **Live Bounding Box Annotations**: Renders detection bounding boxes with track IDs (`#7 Person 97%`), class labels, and color-coded risk indicators.
+  - **Restricted Safety Zones**: Geofenced bounding polygons (`Restricted Hazardous Enclosure`, `Outer Perimeter Caution Buffer`) with real-time breach detection HUD pulsing.
+  - **HUD Overlays & Controls**: Quick toggle switches (`ZONES: ON/OFF`, `HUD: ON/OFF`), video restart, and full-screen telemetry view.
+  - **AI Pipeline Feed Ingestion**: Ingest live tracking outputs from Member 1 (`+ Tracks (M1)`) and behavior classifications from Member 2 (`+ Behaviours (M2)`).
+  - **Current Alert & Active Tracks Panels**: Synchronized entity focus pane displaying active velocity, behavior state, and incident dossiers.
+
+---
+
+### 2. Security & Behavioral Telemetry Dashboard
 Real-time command center displaying overall system status, active surveillance stream telemetry, aggregated KPI metrics, high-priority alert queues, and incident category distributions.
 
 ![Dashboard Preview](screenshots/Screenshot%202026-10-07%20162736.png)
@@ -82,7 +99,7 @@ Real-time command center displaying overall system status, active surveillance s
 
 ---
 
-### 2. DeepSORT Track Explorer & Entity Dossiers
+### 3. DeepSORT Track Explorer & Entity Dossiers
 Detailed lifecycle inspection for any detected entity, tracking historical trajectories and state transitions over time.
 
 ![Track Explorer Preview](screenshots/Screenshot%202026-10-07%20162748.png)
@@ -95,7 +112,7 @@ Detailed lifecycle inspection for any detected entity, tracking historical traje
 
 ---
 
-### 3. System Analytics & Anomaly Forensics
+### 4. System Analytics & Anomaly Forensics
 High-level statistical analysis, risk classification breakdowns, and temporal trend visualization.
 
 ![Analytics Preview](screenshots/Screenshot%202026-10-07%20162759.png)
@@ -106,7 +123,7 @@ High-level statistical analysis, risk classification breakdowns, and temporal tr
 
 ---
 
-### 4. System Settings & Multi-Laptop Gateway Control
+### 5. System Settings & Multi-Laptop Gateway Control
 Operational threshold sliders, architecture matrix, and seamless multi-laptop networking configuration for hackathon presentations.
 
 ![Settings Preview](screenshots/Screenshot%202026-10-07%20162810.png)
@@ -123,14 +140,11 @@ Operational threshold sliders, architecture matrix, and seamless multi-laptop ne
 
 ---
 
-### 5. Video Intelligence Workspace & Forensic Dossiers
-- **Video Analysis (`/analysis`)**:
-  - Live video playback synchronized with real-time bounding box annotations.
-  - Interactive safety zone polygons with dynamic breach alerts (`Restricted Hazardous Enclosure`, `Outer Perimeter Caution Buffer`).
-  - HUD overlay toggles (`ZONES: ON/OFF`, `HUD: ON/OFF`), seekable video timeline with event markers, and active entity panel.
-  - Toolbar buttons to trigger simulated ingestion of Member 1 tracks (`+ Tracks (M1)`) and Member 2 behaviours (`+ Behaviours (M2)`).
-- **Incident Evidence Modal (`/events`)**:
-  - Dual-mode forensic evidence inspection: toggle between photographic keyframe snapshots (`storage/evidence/`) and recorded `.mp4` video clips (`storage/event_clips/`).
+### 6. Forensic Event Dossiers & Dual Evidence Media
+- **Forensic Modal (`/events`)**:
+  - Dual-mode incident evidence modal: toggle between photographic keyframe snapshots (`storage/evidence/`) and recorded `.mp4` video clips (`storage/event_clips/`).
+  - Classification reason, entity linkage, start/end timestamps, and direct "Inspect in Video Analysis Workspace" action.
+
 
 ---
 
