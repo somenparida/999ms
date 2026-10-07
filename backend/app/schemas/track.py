@@ -1,15 +1,21 @@
 from datetime import datetime
 from typing import List, Optional, Any, Dict
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, AliasChoices
 
 class TrackItemImport(BaseModel):
     track_id: int
-    object_type: Optional[str] = "person"
+    object_type: Optional[str] = Field(
+        default="person", validation_alias=AliasChoices("object_type", "class_name")
+    )
+    class_id: Optional[int] = None
+    class_name: Optional[str] = None
     timestamp: float
     frame_number: Optional[int] = 0
     bbox: List[float] = Field(..., description="Bounding box [x, y, w, h] or [x1, y1, x2, y2]")
     center: Optional[List[float]] = None
-    confidence: Optional[float] = 1.0
+    confidence: Optional[float] = Field(
+        default=1.0, validation_alias=AliasChoices("confidence", "detection_confidence")
+    )
     detection_confidence: Optional[float] = None
     velocity: Optional[float] = 0.0
     keypoints: Optional[List[List[float]]] = Field(
@@ -17,8 +23,14 @@ class TrackItemImport(BaseModel):
     )
     metadata: Optional[Dict[str, Any]] = None
 
+    model_config = ConfigDict(extra="ignore")
+
 class TrackImportRequest(BaseModel):
+    metadata: Optional[Dict[str, Any]] = None
+    summary: Optional[Dict[str, Any]] = None
     tracks: List[TrackItemImport]
+
+    model_config = ConfigDict(extra="ignore")
 
 class TrackPositionResponse(BaseModel):
     id: int

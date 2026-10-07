@@ -1,3 +1,5 @@
+import os
+import json
 import io
 
 def create_sample_video(client):
@@ -41,3 +43,23 @@ def test_import_tracks_and_positions_with_keypoints(client):
     positions = pos_res.json()
     assert len(positions) == 1
     assert positions[0]["timestamp"] == 42.31
+
+def test_import_real_tracks_json_dataset(client):
+    video_id = create_sample_video(client)
+    tracks_json_path = os.path.realpath(os.path.join(os.path.dirname(__file__), "../../tracks.json"))
+
+    if os.path.exists(tracks_json_path):
+        with open(tracks_json_path, "r") as f:
+            tracks_payload = json.load(f)
+
+        res = client.post(f"/api/videos/{video_id}/tracks/import", json=tracks_payload)
+        assert res.status_code == 201
+        tracks = res.json()
+        assert len(tracks) > 0
+
+        # Verify positions for Track #1
+        pos_res = client.get(f"/api/videos/{video_id}/tracks/1/positions")
+        assert pos_res.status_code == 200
+        positions = pos_res.json()
+        assert len(positions) > 0
+        assert positions[0]["frame_number"] == 1

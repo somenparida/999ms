@@ -13,47 +13,67 @@ class TrackService:
         if not video:
             raise ValueError(f"Video with ID {video_id} not found")
 
+        # Update video metadata if provided at root level
+        if import_data.metadata:
+            meta = import_data.metadata
+            if meta.get("fps"):
+                video.fps = float(meta["fps"])
+            if meta.get("width"):
+                video.width = int(meta["width"])
+            if meta.get("height"):
+                video.height = int(meta["height"])
+            if meta.get("total_frames"):
+                video.total_frames = int(meta["total_frames"])
+                if video.fps and video.fps > 0:
+                    video.duration = float(video.total_frames / video.fps)
+
         imported_tracks = {}
 
         for item in import_data.tracks:
             # Fallbacks for frame_number and confidence
-            frame_num = item.frame_number if item.frame_number is not None and item.frame_number > 0 else int(item.timestamp * (video.fps or 30.0))
+            frame_num = item.frame_number if (item.frame_number is not None and item.frame_number > 0) else int(item.timestamp * (video.fps or 30.0))
             conf = item.detection_confidence if item.detection_confidence is not None else (item.confidence or 1.0)
 
-            # 1. Fetch or create Track parent object
+            # Fetch or create Track parent object
             track = db.query(Track).filter(
                 Track.video_id == video_id,
                 Track.track_id == item.track_id
             ).first()
 
-            # Parse bounding box: handles [x, y, w, h] or [x1, y1, x2, y2]
+            # Robust Bounding Box parser: handles [x1, y1, x2, y2] or [x, y, w, h]
             bbox = item.bbox
             if len(bbox) >= 4:
-                # Check if format is [x1, y1, x2, y2] where x2 > x and y2 > y
-                if bbox[2] > bbox[0] and bbox[3] > bbox[1] and bbox[2] > 50 and bbox[3] > 50:
-                    x, y = bbox[0], bbox[1]
-                    w = bbox[2] - bbox[0]
-                    h = bbox[3] - bbox[1]
+                # If x2 > x1 and y2 > y1, it is absolute bounding box coordinates [x1, y1, x2, y2]
+                if bbox[2] > bbox[0] and bbox[3] > bbox[1]:
+                    x, y = float(bbox[0]), float(bbox[1])
+                    w = float(bbox[2] - bbox[0])
+                    h = float(bbox[3] - bbox[1])
                 else:
-                    x, y, w, h = bbox[0], bbox[1], bbox[2], bbox[3]
+                    x, y, w, h = float(bbox[0]), float(bbox[1]), float(bbox[2]), float(bbox[3])
             else:
                 x, y, w, h = 0.0, 0.0, 100.0, 200.0
 
             center = item.center
             if center and len(center) >= 2:
-                center_x, center_y = center[0], center[1]
+                center_x, center_y = float(center[0]), float(center[1])
             else:
-                center_x, center_y = x + (w / 2.0), y + (h / 2.0)
+                center_x, center_y = float(x + (w / 2.0)), float(y + (h / 2.0))
 
             metadata_dict = item.metadata.copy() if item.metadata else {}
-            if item.keypoints:
+            if item.keypoints is not None:
                 metadata_dict["keypoints"] = item.keypoints
+            if item.class_id is not None:
+                metadata_dict["class_id"] = item.class_id
+            if item.class_name:
+                metadata_dict["class_name"] = item.class_name
+
+            obj_type = item.object_type or item.class_name or "person"
 
             if not track:
                 track = Track(
                     video_id=video_id,
                     track_id=item.track_id,
-                    object_type=item.object_type or "person",
+                    object_type=obj_type,
                     start_time=item.timestamp,
                     end_time=item.timestamp,
                     first_seen_frame=frame_num,
@@ -78,7 +98,7 @@ class TrackService:
                     current_meta.update(metadata_dict)
                     track.metadata_json = current_meta
 
-            # 2. Check position idempotency
+            # Check position idempotency
             existing_pos = db.query(TrackPosition).filter(
                 TrackPosition.track_id == track.id,
                 TrackPosition.frame_number == frame_num
