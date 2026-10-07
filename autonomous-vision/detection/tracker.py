@@ -23,6 +23,20 @@ from ultralytics import YOLO
 
 from detection.detector import YOLODetector
 
+try:
+    from behavior.behavior_engine import BehaviorEngine
+    from behavior.visualizer import BehaviorVisualizer
+except ImportError:
+    try:
+        _candidate_root = Path(__file__).resolve().parent.parent.parent
+        if str(_candidate_root) not in sys.path:
+            sys.path.insert(0, str(_candidate_root))
+        from behavior.behavior_engine import BehaviorEngine
+        from behavior.visualizer import BehaviorVisualizer
+    except Exception:
+        BehaviorEngine = None
+        BehaviorVisualizer = None
+
 
 class PersonTracker:
     """ByteTrack-based multi-object tracker for person detection and trajectory logging."""
@@ -46,6 +60,7 @@ class PersonTracker:
             target_classes: List of class IDs to track (default: [0] for COCO 'person').
             device: Computation device ('cpu', 'cuda', etc.).
         """
+        self._visualizer = BehaviorVisualizer() if BehaviorVisualizer is not None else None
         self.conf_threshold = conf_threshold
         self.iou_threshold = iou_threshold
         self.tracker_config = tracker_config
@@ -276,6 +291,7 @@ class PersonTracker:
         input_path: Union[str, Path],
         output_video_path: Optional[Union[str, Path]] = None,
         json_output_path: Optional[Union[str, Path]] = None,
+        behavior_engine: Optional[Any] = None,
         progress_callback: Optional[callable] = None,
     ) -> Dict[str, Any]:
         """Process video frame-by-frame with ByteTrack, producing annotated video and tracks.json.
@@ -284,6 +300,7 @@ class PersonTracker:
             input_path: Source video path.
             output_video_path: Destination for annotated tracking video.
             json_output_path: Destination for telemetry JSON (default: data/output/tracks.json).
+            behavior_engine: Optional Member 2 BehaviorEngine instance.
             progress_callback: Optional callback(current_frame, total_frames).
 
         Returns:
@@ -348,6 +365,7 @@ class PersonTracker:
             raise RuntimeError(f"Failed to open VideoWriter for destination: '{dst_video}'.")
 
         all_records: List[Dict[str, Any]] = []
+        all_behavior_events: List[Dict[str, Any]] = []
         unique_track_ids: set[int] = set()
         frames_processed = 0
         start_time = time.time()
@@ -368,16 +386,32 @@ class PersonTracker:
                     persist=True,
                 )
 
+                behavior_pairs = []
                 for r in frame_records:
                     unique_track_ids.add(r["track_id"])
+                    if behavior_engine is not None:
+                        b_result = dispatch_to_behavior_engine(behavior_engine, r)
+                        r["behavior"] = b_result.to_dict()
+                        if b_result.event:
+                            all_behavior_events.append(b_result.event.to_dict())
+                        behavior_pairs.append((r, b_result))
                     all_records.append(r)
 
-                annotated = self.annotate_frame(
-                    frame=frame,
-                    records=frame_records,
-                    frame_number=frames_processed,
-                    total_frames=total_frames if total_frames > 0 else frames_processed,
-                )
+                if behavior_engine is not None and self._visualizer is not None and behavior_pairs:
+                    annotated = self._visualizer.draw_integrated_frame(
+                        frame=frame,
+                        records_with_results=behavior_pairs,
+                        frame_number=frames_processed,
+                        total_frames=total_frames if total_frames > 0 else frames_processed,
+                        fps=fps,
+                    )
+                else:
+                    annotated = self.annotate_frame(
+                        frame=frame,
+                        records=frame_records,
+                        frame_number=frames_processed,
+                        total_frames=total_frames if total_frames > 0 else frames_processed,
+                    )
                 writer.write(annotated)
 
                 if progress_callback:
@@ -403,14 +437,19 @@ class PersonTracker:
                 "height": height,
                 "fps": round(fps, 2),
                 "total_frames": frames_processed,
+                "behavior_engine_enabled": behavior_engine is not None,
             },
             "summary": {
                 "total_records": len(all_records),
                 "unique_person_count": len(unique_track_ids),
                 "unique_track_ids": sorted(list(unique_track_ids)),
+                "behavior_events_count": len(all_behavior_events),
             },
             "tracks": all_records,
         }
+
+        if behavior_engine is not None:
+            json_payload["behavior_events"] = all_behavior_events
 
         with open(dst_json, "w", encoding="utf-8") as f:
             json.dump(json_payload, f, indent=2)
@@ -426,6 +465,8 @@ class PersonTracker:
             "unique_person_count": len(unique_track_ids),
             "unique_track_ids": sorted(list(unique_track_ids)),
             "total_tracking_records": len(all_records),
+            "behavior_events_count": len(all_behavior_events),
+            "behavior_events": all_behavior_events,
             "elapsed_seconds": round(elapsed, 2),
             "processing_fps": round(avg_fps, 2),
             "tracks": all_records,
@@ -540,12 +581,25 @@ def main() -> None:
         default="bytetrack.yaml",
         help="Tracking configuration (default: bytetrack.yaml)",
     )
+    parser.add_argument(
+        "--with-behavior",
+        action="store_true",
+        help="Enable Member 2 Behavior Engine processing and visualization",
+    )
+    parser.add_argument(
+        "--behavior-config",
+        type=str,
+        default=None,
+        help="Path to behavior configuration YAML (default: configs/behavior.yaml)",
+    )
 
     args = parser.parse_args()
 
     print("=" * 65)
     print("Autonomous Vision & Behaviour Understanding System")
     print("Member 1 Module: Person Tracking with ByteTrack (Phase 3)")
+    if args.with_behavior:
+        print("Member 2 Integration: Behavior Intelligence Engine ACTIVE")
     print("=" * 65)
 
     try:
@@ -554,6 +608,16 @@ def main() -> None:
             conf_threshold=args.conf,
             tracker_config=args.tracker_config,
         )
+
+        behavior_engine = None
+        if args.with_behavior:
+            if BehaviorEngine is None:
+                raise RuntimeError("BehaviorEngine could not be imported from 'behavior' module.")
+            cfg_path = args.behavior_config
+            if cfg_path is None:
+                default_cfg = Path(__file__).resolve().parent.parent.parent / "configs" / "behavior.yaml"
+                cfg_path = str(default_cfg) if default_cfg.exists() else None
+            behavior_engine = BehaviorEngine(cfg_path)
 
         def print_progress(cur: int, total: int) -> None:
             if total > 0 and (cur % 5 == 0 or cur == total):
@@ -566,12 +630,15 @@ def main() -> None:
         print(f"Tracker     : {args.tracker_config}")
         print(f"Confidence  : {args.conf}")
         print(f"Target Class: person (COCO ID 0)")
+        if behavior_engine is not None:
+            print("Behavior    : Enabled (Activity recognition, falls, ergonomics, normality)")
         print("-" * 65)
 
         summary = tracker.process_video(
             input_path=args.input,
             output_video_path=args.output,
             json_output_path=args.json_output,
+            behavior_engine=behavior_engine,
             progress_callback=print_progress,
         )
 
@@ -585,6 +652,8 @@ def main() -> None:
         print(f"Unique Persons    : {summary['unique_person_count']}")
         print(f"Unique Track IDs  : {summary['unique_track_ids']}")
         print(f"Total Records     : {summary['total_tracking_records']}")
+        if "behavior_events_count" in summary:
+            print(f"Behavior Events   : {summary['behavior_events_count']}")
         print(f"Elapsed Time      : {summary['elapsed_seconds']}s ({summary['processing_fps']} FPS)")
         print("=" * 65)
 

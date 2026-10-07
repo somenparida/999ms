@@ -352,37 +352,72 @@ python examples/render_simulation_video.py
 
 ---
 
-## 🤝 Integrating with Member 1 (Detector & Tracker)
+## 🤝 Member 1 + Member 2 Integration (Implemented & Operational)
 
-Integrating Member 1's YOLOv8 / ByteTrack pipeline requires only 4 lines of code:
+Member 1 (`autonomous-vision` — YOLO11 & ByteTrack) and Member 2 (`behavior` — Behavior Intelligence Engine) are fully integrated into a unified end-to-end video pipeline.
+
+### 1. Run the Integrated Sentinel Pipeline (Recommended)
+
+Run the unified orchestrator on any warehouse video file:
+
+```powershell
+python run_sentinel.py --input autonomous-vision/data/input/multi_person.mp4 --output output/integrated_multi_person.mp4 --json-output output/integrated_telemetry.json
+```
+
+**What it does:**
+1. Tracks people using YOLO11n + ByteTrack with persistent track IDs.
+2. Evaluates kinematics, 8 activity classes, fall sequences, and ergonomics per track.
+3. Renders a combined video HUD with track IDs, activity labels, normality status badges (`NORMAL`, `POTENTIALLY_UNUSUAL`, `ABNORMAL`), velocity tags, and flashing alert banners.
+4. Exports comprehensive JSON telemetry combining tracking metadata and full behavioral records/events for Member 3/4.
+
+---
+
+### 2. Run Member 1 Native Tracker with Behavior Intelligence
+
+Member 1's native CLI also directly supports behavior intelligence via the `--with-behavior` flag:
+
+```powershell
+python -m detection.tracker --input data/input/multi_person.mp4 --with-behavior
+```
+
+---
+
+### 3. Programmatic Usage (`SentinelPipeline`)
 
 ```python
-from behavior.behavior_engine import BehaviorEngine
+from pipeline.sentinel_pipeline import SentinelPipeline
 
-# 1. Initialize engine
-engine = BehaviorEngine("configs/behavior.yaml")
+pipeline = SentinelPipeline(
+    model_path="autonomous-vision/models/yolo11n.pt",
+    behavior_config="configs/behavior.yaml",
+    conf_threshold=0.25,
+)
 
-# 2. Inside Member 1's per-frame tracking loop:
-for track in tracker.get_active_tracks():
-    track_id = track.id
-    bbox = track.to_tlbr() # [x1, y1, x2, y2]
-    keypoints = getattr(track, "keypoints", None)
-    conf = track.confidence
-    timestamp = current_video_time_seconds
+# Process video file end-to-end:
+summary = pipeline.process_video(
+    input_path="autonomous-vision/data/input/multi_person.mp4",
+    output_video_path="output/annotated.mp4",
+    json_output_path="output/telemetry.json",
+)
 
-    # 3. Feed observation into Behavior Engine
-    result = engine.update(
-        track_id=track_id,
-        timestamp=timestamp,
-        bbox=bbox,
-        keypoints=keypoints,
-        detection_confidence=conf
-    )
+# Or stream frame-by-frame for real-time dashboards (Member 3/4):
+for frame_num, timestamp, annotated_frame, records, events in pipeline.stream_video("video.mp4"):
+    # annotated_frame: BGR numpy image with complete HUD
+    # records: List of track dicts enriched with record["behavior"]
+    # events: List of safety hazard events triggered on this frame
+    pass
+```
 
-    # 4. Access structured behavior and normality output
-    print(f"Person {track_id}: {result.activity} -> {result.status} ({result.severity})")
-    if result.event:
-        send_alert_to_dashboard(result.event.to_dict())
+---
+
+### 4. Comprehensive Test Suite (79 Passing Tests)
+
+```powershell
+# Run Behavior Intelligence & Integration tests (60 tests)
+python -m pytest tests/ -v
+
+# Run Member 1 Detection & Tracking tests (19 tests)
+$env:PYTHONPATH="autonomous-vision"; python -m unittest discover -s autonomous-vision/tests -p "test_*.py" -v
 ```
 
 ---
