@@ -5,7 +5,7 @@ def create_sample_video(client):
     res = client.post("/api/videos/upload", files=files)
     return res.json()["id"]
 
-def test_import_tracks_and_positions(client):
+def test_import_tracks_and_positions_with_keypoints(client):
     video_id = create_sample_video(client)
 
     payload = {
@@ -14,19 +14,12 @@ def test_import_tracks_and_positions(client):
                 "track_id": 7,
                 "object_type": "person",
                 "timestamp": 42.31,
-                "frame_number": 1269,
-                "bbox": [120, 80, 220, 350],
-                "center": [170, 215],
-                "confidence": 0.94
-            },
-            {
-                "track_id": 7,
-                "object_type": "person",
-                "timestamp": 45.00,
-                "frame_number": 1350,
-                "bbox": [125, 82, 220, 350],
-                "center": [175, 217],
-                "confidence": 0.95
+                "detection_confidence": 0.94,
+                "bbox": [100.0, 150.0, 160.0, 310.0],
+                "keypoints": [
+                    [130.0, 160.0, 0.95],
+                    [132.0, 162.0, 0.92]
+                ]
             }
         ]
     }
@@ -46,5 +39,5 @@ def test_import_tracks_and_positions(client):
     pos_res = client.get(f"/api/videos/{video_id}/tracks/7/positions")
     assert pos_res.status_code == 200
     positions = pos_res.json()
-    assert len(positions) == 2
-    assert positions[0]["frame_number"] == 1269
+    assert len(positions) == 1
+    assert positions[0]["timestamp"] == 42.31

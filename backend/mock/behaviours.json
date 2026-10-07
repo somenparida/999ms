@@ -2,30 +2,67 @@
   "behaviours": [
     {
       "track_id": 3,
-      "behaviour_type": "walking",
-      "start_time": 12.20,
+      "activity": "WALKING",
+      "status": "NORMAL",
+      "severity": "NONE",
+      "timestamp": 12.20,
       "end_time": 25.40,
       "confidence": 0.92,
-      "classification": "normal",
-      "reason": "Standard walking motion detected along pathway."
+      "previous_activity": "STANDING",
+      "duration": 13.2,
+      "transition": {
+        "from": "STANDING",
+        "to": "WALKING",
+        "timestamp": 12.20
+      },
+      "reason": "Standard walking trajectory along pathway."
+    },
+    {
+      "track_id": 4,
+      "activity": "BENDING",
+      "status": "POTENTIALLY_UNUSUAL",
+      "severity": "LOW",
+      "timestamp": 42.00,
+      "end_time": 72.00,
+      "confidence": 0.88,
+      "previous_activity": "WALKING",
+      "duration": 30.0,
+      "reason": "Prolonged bending for repetitive lifting"
     },
     {
       "track_id": 7,
-      "behaviour_type": "restricted_area_entry",
-      "start_time": 42.31,
+      "activity": "FALLING",
+      "status": "ABNORMAL",
+      "severity": "HIGH",
+      "timestamp": 52.70,
       "end_time": 55.82,
       "confidence": 0.94,
-      "classification": "abnormal",
-      "reason": "Person crossed restricted boundary near Zone A."
-    },
-    {
-      "track_id": 7,
-      "behaviour_type": "prolonged_inactivity",
-      "start_time": 60.00,
-      "end_time": 120.00,
-      "confidence": 0.89,
-      "classification": "abnormal",
-      "reason": "Person remained stationary for over 60 seconds."
+      "previous_activity": "WALKING",
+      "duration": 0.0,
+      "transition": {
+        "from": "WALKING",
+        "to": "FALLING",
+        "timestamp": 52.70
+      },
+      "reason": [
+        "rapid downward movement (60.0 px/s >= 40.0)",
+        "impact acceleration spike (600.0 px/s² >= 30.0)",
+        "posture transition to horizontal",
+        "low post-fall movement"
+      ],
+      "event": {
+        "type": "POSSIBLE_FALL",
+        "track_id": 7,
+        "timestamp": 52.7,
+        "confidence": 0.94,
+        "severity": "HIGH",
+        "details": {
+          "max_downward_velocity": 60.0,
+          "max_acceleration": 600.0,
+          "aspect_ratio_change": 2.45,
+          "composite_fall_score": 0.94
+        }
+      }
     }
   ]
 }

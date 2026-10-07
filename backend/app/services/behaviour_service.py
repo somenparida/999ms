@@ -1,9 +1,9 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 from sqlalchemy.orm import Session
 from app.models.video import Video
 from app.models.track import Track
 from app.models.behaviour import Behaviour
-from app.schemas.behaviour import BehaviourImportRequest
+from app.schemas.behaviour import BehaviourImportRequest, BehaviourItemImport
 from app.services.event_service import EventService
 from app.core.logging import logger
 
@@ -17,6 +17,39 @@ class BehaviourService:
         imported_behaviours = []
 
         for item in import_data.behaviours:
+            activity_name = item.behaviour_type
+            start_t = item.start_time
+            end_t = item.end_time if item.end_time is not None else (start_t + (item.duration or 0.0))
+
+            # Resolve classification & status
+            raw_cls = (item.classification or "normal").lower()
+            if raw_cls in ["abnormal", "potentially_unusual"]:
+                classification = "abnormal"
+            elif raw_cls == "unknown":
+                classification = "unknown"
+            else:
+                classification = "normal"
+
+            # Format reason
+            reason_val = item.reason
+            if isinstance(reason_val, list):
+                reason_val = " | ".join(reason_val)
+
+            # Build metadata dict for extra Member 2 fields
+            meta_dict = item.metadata.copy() if item.metadata else {}
+            if item.previous_activity:
+                meta_dict["previous_activity"] = item.previous_activity
+            if item.duration is not None:
+                meta_dict["duration"] = item.duration
+            if item.transition:
+                meta_dict["transition"] = item.transition
+            if item.event:
+                meta_dict["event"] = item.event
+            if item.severity:
+                meta_dict["severity"] = item.severity
+            if item.keypoints:
+                meta_dict["keypoints"] = item.keypoints
+
             # Locate track for this video
             track = db.query(Track).filter(
                 Track.video_id == video_id,
@@ -29,10 +62,10 @@ class BehaviourService:
                     video_id=video_id,
                     track_id=item.track_id,
                     object_type="person",
-                    start_time=item.start_time,
-                    end_time=item.end_time,
-                    first_seen_frame=0,
-                    last_seen_frame=0,
+                    start_time=start_t,
+                    end_time=end_t,
+                    first_seen_frame=int(start_t * 30.0),
+                    last_seen_frame=int(end_t * 30.0),
                     average_confidence=item.confidence or 1.0,
                     metadata_json={}
                 )
@@ -43,29 +76,33 @@ class BehaviourService:
             existing = db.query(Behaviour).filter(
                 Behaviour.video_id == video_id,
                 Behaviour.track_id == track.id,
-                Behaviour.behaviour_type == item.behaviour_type,
-                Behaviour.start_time == item.start_time
+                Behaviour.behaviour_type == activity_name,
+                Behaviour.start_time == start_t
             ).first()
 
             if not existing:
                 behaviour = Behaviour(
                     video_id=video_id,
                     track_id=track.id,
-                    behaviour_type=item.behaviour_type,
-                    start_time=item.start_time,
-                    end_time=item.end_time,
+                    behaviour_type=activity_name,
+                    start_time=start_t,
+                    end_time=end_t,
                     confidence=item.confidence or 1.0,
-                    classification=item.classification or "normal",
-                    reason=item.reason,
-                    metadata_json=item.metadata or {}
+                    classification=classification,
+                    reason=reason_val,
+                    metadata_json=meta_dict
                 )
                 db.add(behaviour)
                 db.flush()
             else:
                 behaviour = existing
+                if meta_dict:
+                    curr_meta = behaviour.metadata_json or {}
+                    curr_meta.update(meta_dict)
+                    behaviour.metadata_json = curr_meta
 
-            # Trigger event creation if abnormal
-            if behaviour.classification.lower() == "abnormal":
+            # Trigger event creation if abnormal / potentially unusual
+            if classification == "abnormal":
                 EventService.create_event_from_behaviour(db, behaviour)
 
             imported_behaviours.append(behaviour)
