@@ -30,6 +30,7 @@ from .activity_classifier import ActivityClassifier, RuleBasedActivityClassifier
 from .smoothing import TemporalSmoother
 from .state_manager import StateManager
 from .fall_detector import FallDetector
+from .normality import NormalityClassifier
 
 logger = logging.getLogger("behavior_engine")
 
@@ -64,6 +65,8 @@ class BehaviorEngine:
         self.smoother = TemporalSmoother(self.config.smoothing)
         self.state_manager = StateManager(self.config)
         self.fall_detector = FallDetector(self.config.fall_detection)
+        self.normality_classifier = NormalityClassifier(self.config.normality)
+        self._fallen_tracks: set[int] = set()
 
     def update(
         self,
@@ -163,10 +166,25 @@ class BehaviorEngine:
         # 8. Event arbitration: prioritize fall events over standard state change events
         active_event: Optional[BehaviorEvent] = fall_event if fall_event is not None else state_event
 
-        # 9. Structured logging
+        # 9. Normality & safety classification (NORMAL, POTENTIALLY_UNUSUAL, ABNORMAL)
+        if current_activity == ActivityType.FALLING or fall_detected:
+            self._fallen_tracks.add(track_id)
+        elif current_activity in (ActivityType.STANDING, ActivityType.WALKING, ActivityType.RUNNING):
+            self._fallen_tracks.discard(track_id)
+
+        has_fallen = track_id in self._fallen_tracks
+        normality_res = self.normality_classifier.classify(
+            activity=current_activity,
+            duration=duration,
+            previous_activity=prev_activity,
+            has_fallen=has_fallen,
+        )
+
+        # 10. Structured logging
         logger.debug(
             f"[{timestamp:.2f}] Track {track_id} "
             f"Activity: {current_activity.value} "
+            f"Status: {normality_res.status.value} ({normality_res.severity.value}) "
             f"Confidence: {proposed_confidence:.2f} "
             f"Velocity: {motion_features.pixel_velocity:.1f} px/s"
         )
@@ -182,6 +200,9 @@ class BehaviorEngine:
             motion_features=motion_features,
             pose_features=pose_features,
             event=active_event,
+            status=normality_res.status,
+            severity=normality_res.severity,
+            status_reason=normality_res.reason,
         )
 
     def remove_track(self, track_id: int) -> bool:
@@ -190,6 +211,7 @@ class BehaviorEngine:
         self.smoother.remove_track(track_id)
         self.state_manager.remove_track(track_id)
         self.fall_detector.remove_track(track_id)
+        self._fallen_tracks.discard(track_id)
         return b_res
 
     def get_track_state(self, track_id: int) -> Optional[Dict[str, Any]]:
@@ -202,4 +224,5 @@ class BehaviorEngine:
         self.smoother.clear()
         self.state_manager.clear()
         self.fall_detector.clear()
+        self._fallen_tracks.clear()
         logger.info("BehaviorEngine state reset")

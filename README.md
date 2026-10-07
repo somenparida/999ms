@@ -173,6 +173,37 @@ The engine returns a strongly typed `BehaviorResult` object (or structured JSON 
 
 ---
 
+## 4.1 Normal vs. Abnormal Intelligence Layer (`behavior/normality.py`)
+
+Activities themselves are not inherently abnormal. The system translates recognized activities and temporal context into explainable normality statuses:
+
+```text
+STANDING   → NORMAL (Severity: NONE)
+WALKING    → NORMAL (Severity: NONE)
+RUNNING    → NORMAL (Severity: NONE)
+SITTING    → NORMAL (Severity: NONE)
+CROUCHING  → NORMAL (if duration <= 30s) / POTENTIALLY_UNUSUAL (if > 30s, Severity: LOW)
+BENDING    → NORMAL (if duration <= 30s) / POTENTIALLY_UNUSUAL (if > 30s, Severity: LOW)
+LYING      → NORMAL (if duration <= 30s) / POTENTIALLY_UNUSUAL (if > 30s, Severity: LOW)
+FALLING    → ABNORMAL (Severity: HIGH, Reason: "Possible fall detected")
+FALLING → LYING → ABNORMAL (Severity: HIGH, Reason: "Lying following a fall")
+UNKNOWN    → UNKNOWN (Severity: NONE)
+```
+
+Structured output per person:
+```json
+{
+  "track_id": 7,
+  "activity": "BENDING",
+  "status": "POTENTIALLY_UNUSUAL",
+  "severity": "LOW",
+  "confidence": 0.92,
+  "reason": "Prolonged bending"
+}
+```
+
+---
+
 ## 5. Temporal Buffer & Kinematics
 
 Each tracked subject maintains an independent rolling temporal buffer (`TrackHistory`):

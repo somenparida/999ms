@@ -97,6 +97,13 @@ class ClassifierConfig:
 
 
 @dataclass
+class NormalityConfig:
+    prolonged_bending_seconds: float = 30.0
+    prolonged_crouching_seconds: float = 30.0
+    prolonged_lying_seconds: float = 30.0
+
+
+@dataclass
 class BehaviorEngineConfig:
     history: HistoryConfig = field(default_factory=HistoryConfig)
     motion: MotionConfig = field(default_factory=MotionConfig)
@@ -104,6 +111,7 @@ class BehaviorEngineConfig:
     smoothing: SmoothingConfig = field(default_factory=SmoothingConfig)
     fall_detection: FallDetectionConfig = field(default_factory=FallDetectionConfig)
     classifier: ClassifierConfig = field(default_factory=ClassifierConfig)
+    normality: NormalityConfig = field(default_factory=NormalityConfig)
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> BehaviorEngineConfig:
@@ -226,6 +234,13 @@ class BehaviorEngineConfig:
             ),
         )
 
+        normality_data = data.get("normality", {})
+        normality_cfg = NormalityConfig(
+            prolonged_bending_seconds=float(normality_data.get("prolonged_bending_seconds", 30.0)),
+            prolonged_crouching_seconds=float(normality_data.get("prolonged_crouching_seconds", 30.0)),
+            prolonged_lying_seconds=float(normality_data.get("prolonged_lying_seconds", 30.0)),
+        )
+
         return cls(
             history=history_cfg,
             motion=motion_cfg,
@@ -233,6 +248,7 @@ class BehaviorEngineConfig:
             smoothing=smoothing_cfg,
             fall_detection=fall_cfg,
             classifier=classifier_cfg,
+            normality=normality_cfg,
         )
 
 

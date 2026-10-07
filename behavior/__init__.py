@@ -7,6 +7,7 @@ from .schemas import (
     ActivityType,
     EventType,
     Severity,
+    BehaviorStatus,
     BoundingBox,
     Keypoint,
     MotionFeatures,
@@ -15,13 +16,15 @@ from .schemas import (
     BehaviorEvent,
     BehaviorResult,
 )
-from .config import BehaviorEngineConfig, load_config
+from .config import BehaviorEngineConfig, NormalityConfig, load_config
 from .behavior_engine import BehaviorEngine
+from .normality import NormalityClassifier, NormalityResult, classify_behavior
 
 __all__ = [
     "ActivityType",
     "EventType",
     "Severity",
+    "BehaviorStatus",
     "BoundingBox",
     "Keypoint",
     "MotionFeatures",
@@ -30,6 +33,10 @@ __all__ = [
     "BehaviorEvent",
     "BehaviorResult",
     "BehaviorEngineConfig",
+    "NormalityConfig",
     "load_config",
     "BehaviorEngine",
+    "NormalityClassifier",
+    "NormalityResult",
+    "classify_behavior",
 ]

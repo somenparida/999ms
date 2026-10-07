@@ -35,7 +35,18 @@ class EventType(str, Enum):
         return self.value
 
 
+class BehaviorStatus(str, Enum):
+    NORMAL = "NORMAL"
+    POTENTIALLY_UNUSUAL = "POTENTIALLY_UNUSUAL"
+    ABNORMAL = "ABNORMAL"
+    UNKNOWN = "UNKNOWN"
+
+    def __str__(self) -> str:
+        return self.value
+
+
 class Severity(str, Enum):
+    NONE = "NONE"
     LOW = "LOW"
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"
@@ -197,14 +208,19 @@ class BehaviorResult:
     motion_features: Optional[MotionFeatures] = None
     pose_features: Optional[PoseFeatures] = None
     event: Optional[BehaviorEvent] = None
+    status: BehaviorStatus = BehaviorStatus.NORMAL
+    severity: Severity = Severity.NONE
+    status_reason: Optional[str] = None
 
     def __getitem__(self, key: str) -> Any:
         """Enable dictionary-style access result['activity']."""
         if key == "duration":
             return self.activity_duration
+        if key == "reason":
+            return self.status_reason
         if hasattr(self, key):
             val = getattr(self, key)
-            if isinstance(val, (ActivityType, EventType, Severity)):
+            if isinstance(val, (ActivityType, EventType, Severity, BehaviorStatus)):
                 return val.value
             return val
         raise KeyError(key)
@@ -215,7 +231,10 @@ class BehaviorResult:
             "track_id": self.track_id,
             "timestamp": self.timestamp,
             "activity": self.activity.value,
+            "status": self.status.value,
+            "severity": self.severity.value,
             "confidence": round(self.confidence, 4),
+            "reason": self.status_reason,
             "previous_activity": self.previous_activity.value if self.previous_activity else None,
             "duration": round(self.activity_duration, 2),
             "transition": self.transition.to_dict() if self.transition else None,

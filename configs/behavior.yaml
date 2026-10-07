@@ -112,3 +112,9 @@ classifier:
   min_detection_confidence: 0.45
   # Activity prediction confidence discount when pose is missing (motion-only)
   missing_pose_confidence_penalty: 0.15
+
+normality:
+  # Duration thresholds for prolonged sustained postures
+  prolonged_bending_seconds: 30.0    # > 30s bending is POTENTIALLY_UNUSUAL
+  prolonged_crouching_seconds: 30.0  # > 30s crouching is POTENTIALLY_UNUSUAL
+  prolonged_lying_seconds: 30.0      # > 30s lying (without fall) is POTENTIALLY_UNUSUAL
