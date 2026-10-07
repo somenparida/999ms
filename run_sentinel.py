@@ -51,7 +51,7 @@ def main() -> None:
         "-j",
         type=str,
         default=None,
-        help="Path to telemetry JSON export (default: output/<stem>_sentinel.json)",
+        help="Path to telemetry JSON export (default: output/behaviours.json)",
     )
     parser.add_argument(
         "--model",

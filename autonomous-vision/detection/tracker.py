@@ -352,7 +352,8 @@ class PersonTracker:
 
         # Resolve JSON telemetry destination
         if json_output_path is None:
-            dst_json = project_root / "data" / "output" / "tracks.json"
+            filename = "behaviours.json" if behavior_engine is not None else "tracks.json"
+            dst_json = project_root / "data" / "output" / filename
             dst_json.parent.mkdir(parents=True, exist_ok=True)
         else:
             dst_json = Path(json_output_path)
@@ -561,7 +562,7 @@ def main() -> None:
         "-j",
         type=str,
         default=None,
-        help="Path to tracking JSON telemetry (default: data/output/tracks.json)",
+        help="Path to tracking JSON telemetry (default: data/output/tracks.json, or data/output/behaviours.json with --with-behavior)",
     )
     parser.add_argument(
         "--model",

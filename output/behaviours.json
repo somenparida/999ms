@@ -1,0 +1,2453 @@
+{
+  "metadata": {
+    "system": "Warehouse Sentinel",
+    "subsystems": [
+      "Member 1 (YOLO11 + ByteTrack)",
+      "Member 2 (Behavior Intelligence)"
+    ],
+    "video_source": "D:\\chud\\autonomous-vision\\data\\input\\multi_person.mp4",
+    "tracker": "ByteTrack",
+    "model": "yolo11n.pt",
+    "width": 640,
+    "height": 480,
+    "fps": 10.0,
+    "total_frames": 20,
+    "elapsed_seconds": 2.56,
+    "processing_fps": 7.82
+  },
+  "summary": {
+    "total_records": 69,
+    "unique_person_count": 4,
+    "unique_track_ids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "total_safety_events": 4,
+    "activity_distribution": {
+      "STANDING": 27,
+      "WALKING": 35,
+      "RUNNING": 7
+    },
+    "status_distribution": {
+      "NORMAL": 69,
+      "POTENTIALLY_UNUSUAL": 0,
+      "ABNORMAL": 0,
+      "UNKNOWN": 0
+    }
+  },
+  "events": [
+    {
+      "type": "ACTIVITY_CHANGE",
+      "track_id": 2,
+      "timestamp": 0.5,
+      "confidence": 0.8875,
+      "severity": "LOW",
+      "reason": [
+        "Transitioned from STANDING to WALKING"
+      ],
+      "details": {
+        "from_activity": "STANDING",
+        "to_activity": "WALKING",
+        "previous_duration": 0.0
+      }
+    },
+    {
+      "type": "ACTIVITY_CHANGE",
+      "track_id": 3,
+      "timestamp": 0.5,
+      "confidence": 0.8721,
+      "severity": "LOW",
+      "reason": [
+        "Transitioned from STANDING to WALKING"
+      ],
+      "details": {
+        "from_activity": "STANDING",
+        "to_activity": "WALKING",
+        "previous_duration": 0.0
+      }
+    },
+    {
+      "type": "ACTIVITY_CHANGE",
+      "track_id": 1,
+      "timestamp": 0.8,
+      "confidence": 0.8094,
+      "severity": "LOW",
+      "reason": [
+        "Transitioned from STANDING to WALKING"
+      ],
+      "details": {
+        "from_activity": "STANDING",
+        "to_activity": "WALKING",
+        "previous_duration": 0.0
+      }
+    },
+    {
+      "type": "ACTIVITY_CHANGE",
+      "track_id": 3,
+      "timestamp": 1.3,
+      "confidence": 0.7574,
+      "severity": "LOW",
+      "reason": [
+        "Transitioned from WALKING to RUNNING"
+      ],
+      "details": {
+        "from_activity": "WALKING",
+        "to_activity": "RUNNING",
+        "previous_duration": 0.0
+      }
+    }
+  ],
+  "tracks": [
+    {
+      "track_id": 1,
+      "timestamp": 0.0,
+      "bbox": [
+        42.72,
+        175.35,
+        194.88,
+        398.45
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8746,
+      "frame_number": 1,
+      "center": [
+        118.8,
+        286.9
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8746,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 0.0,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.6666,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.0,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 0.0,
+      "bbox": [
+        188.56,
+        178.59,
+        286.94,
+        381.33
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8565,
+      "frame_number": 1,
+      "center": [
+        237.75,
+        279.96
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8565,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 0.0,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.65,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.0,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 0.0,
+      "bbox": [
+        562.27,
+        275.62,
+        639.94,
+        388.39
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8225,
+      "frame_number": 1,
+      "center": [
+        601.11,
+        332.0
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8225,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 0.0,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.6187,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.0,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 4,
+      "timestamp": 0.0,
+      "bbox": [
+        0.07,
+        248.29,
+        64.2,
+        386.65
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8002,
+      "frame_number": 1,
+      "center": [
+        32.13,
+        317.47
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8002,
+      "behavior": {
+        "track_id": 4,
+        "timestamp": 0.0,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5982,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.0,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 0.1,
+      "bbox": [
+        41.69,
+        175.28,
+        195.09,
+        400.1
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8543,
+      "frame_number": 2,
+      "center": [
+        118.39,
+        287.69
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8543,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 0.1,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.1,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 0.1,
+      "bbox": [
+        187.44,
+        178.96,
+        285.66,
+        381.28
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8429,
+      "frame_number": 2,
+      "center": [
+        236.55,
+        280.12
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8429,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 0.1,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5357,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.1,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 0.1,
+      "bbox": [
+        560.52,
+        275.09,
+        639.28,
+        389.39
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8266,
+      "frame_number": 2,
+      "center": [
+        599.9,
+        332.24
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8266,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 0.1,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5421,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.1,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 4,
+      "timestamp": 0.1,
+      "bbox": [
+        0.0,
+        247.9,
+        63.54,
+        386.87
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.7076,
+      "frame_number": 2,
+      "center": [
+        31.77,
+        317.38
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.7076,
+      "behavior": {
+        "track_id": 4,
+        "timestamp": 0.1,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.1,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 0.2,
+      "bbox": [
+        39.92,
+        175.0,
+        194.77,
+        401.85
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8667,
+      "frame_number": 3,
+      "center": [
+        117.34,
+        288.43
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8667,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 0.2,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.6102,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.2,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 0.2,
+      "bbox": [
+        185.86,
+        178.82,
+        284.34,
+        381.63
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8208,
+      "frame_number": 3,
+      "center": [
+        235.1,
+        280.23
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8208,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 0.2,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.7116,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.2,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 0.2,
+      "bbox": [
+        557.3,
+        268.53,
+        640.0,
+        389.05
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.7777,
+      "frame_number": 3,
+      "center": [
+        598.65,
+        328.79
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.7777,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 0.2,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.7123,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.2,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 4,
+      "timestamp": 0.2,
+      "bbox": [
+        0.0,
+        249.07,
+        62.17,
+        387.34
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.491,
+      "frame_number": 3,
+      "center": [
+        31.09,
+        318.2
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.491,
+      "behavior": {
+        "track_id": 4,
+        "timestamp": 0.2,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.2,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 0.3,
+      "bbox": [
+        37.77,
+        175.29,
+        192.56,
+        401.93
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8501,
+      "frame_number": 4,
+      "center": [
+        115.17,
+        288.61
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8501,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 0.3,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5785,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.3,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 0.3,
+      "bbox": [
+        184.42,
+        179.4,
+        282.58,
+        381.43
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8051,
+      "frame_number": 4,
+      "center": [
+        233.5,
+        280.42
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8051,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 0.3,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.7991,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.3,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 0.3,
+      "bbox": [
+        554.58,
+        263.5,
+        640.0,
+        389.57
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.73,
+      "frame_number": 4,
+      "center": [
+        597.29,
+        326.53
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.73,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 0.3,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.7951,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.3,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 4,
+      "timestamp": 0.3,
+      "bbox": [
+        0.0,
+        248.73,
+        60.42,
+        386.22
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.324,
+      "frame_number": 4,
+      "center": [
+        30.21,
+        317.48
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.324,
+      "behavior": {
+        "track_id": 4,
+        "timestamp": 0.3,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.7561,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.3,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 0.4,
+      "bbox": [
+        34.7,
+        175.2,
+        189.63,
+        401.86
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8579,
+      "frame_number": 5,
+      "center": [
+        112.16,
+        288.53
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8579,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 0.4,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.6919,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.4,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 0.4,
+      "bbox": [
+        180.87,
+        178.51,
+        279.45,
+        381.48
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8187,
+      "frame_number": 5,
+      "center": [
+        230.16,
+        280.0
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8187,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 0.4,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.8527,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.4,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 0.4,
+      "bbox": [
+        552.86,
+        260.63,
+        640.0,
+        388.99
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.6088,
+      "frame_number": 5,
+      "center": [
+        596.43,
+        324.81
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.6088,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 0.4,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.8384,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.4,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 4,
+      "timestamp": 0.4,
+      "bbox": [
+        0.0,
+        251.19,
+        58.85,
+        386.26
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.4343,
+      "frame_number": 5,
+      "center": [
+        29.43,
+        318.73
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.4343,
+      "behavior": {
+        "track_id": 4,
+        "timestamp": 0.4,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5461,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.4,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 0.5,
+      "bbox": [
+        32.06,
+        175.04,
+        187.9,
+        402.68
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.842,
+      "frame_number": 6,
+      "center": [
+        109.98,
+        288.86
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.842,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 0.5,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.7647,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.5,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 0.5,
+      "bbox": [
+        178.3,
+        179.01,
+        276.44,
+        381.02
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8074,
+      "frame_number": 6,
+      "center": [
+        227.37,
+        280.01
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8074,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 0.5,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.8875,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.0,
+        "transition": {
+          "from": "STANDING",
+          "to": "WALKING",
+          "timestamp": 0.5
+        },
+        "event": {
+          "type": "ACTIVITY_CHANGE",
+          "track_id": 2,
+          "timestamp": 0.5,
+          "confidence": 0.8875,
+          "severity": "LOW",
+          "reason": [
+            "Transitioned from STANDING to WALKING"
+          ],
+          "details": {
+            "from_activity": "STANDING",
+            "to_activity": "WALKING",
+            "previous_duration": 0.0
+          }
+        }
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 0.5,
+      "bbox": [
+        550.7,
+        256.89,
+        640.0,
+        389.34
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.636,
+      "frame_number": 6,
+      "center": [
+        595.35,
+        323.12
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.636,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 0.5,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.8721,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.0,
+        "transition": {
+          "from": "STANDING",
+          "to": "WALKING",
+          "timestamp": 0.5
+        },
+        "event": {
+          "type": "ACTIVITY_CHANGE",
+          "track_id": 3,
+          "timestamp": 0.5,
+          "confidence": 0.8721,
+          "severity": "LOW",
+          "reason": [
+            "Transitioned from STANDING to WALKING"
+          ],
+          "details": {
+            "from_activity": "STANDING",
+            "to_activity": "WALKING",
+            "previous_duration": 0.0
+          }
+        }
+      }
+    },
+    {
+      "track_id": 4,
+      "timestamp": 0.5,
+      "bbox": [
+        0.0,
+        256.29,
+        57.2,
+        386.27
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.5054,
+      "frame_number": 6,
+      "center": [
+        28.6,
+        321.28
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.5054,
+      "behavior": {
+        "track_id": 4,
+        "timestamp": 0.5,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.4383,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.5,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 0.6,
+      "bbox": [
+        29.21,
+        174.9,
+        185.3,
+        402.87
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.85,
+      "frame_number": 7,
+      "center": [
+        107.26,
+        288.88
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.85,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 0.6,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.8163,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.6,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 0.6,
+      "bbox": [
+        176.44,
+        178.94,
+        274.74,
+        381.11
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.7908,
+      "frame_number": 7,
+      "center": [
+        225.59,
+        280.02
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.7908,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 0.6,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.9114,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.1,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 0.6,
+      "bbox": [
+        545.69,
+        244.29,
+        640.0,
+        388.73
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.5184,
+      "frame_number": 7,
+      "center": [
+        592.85,
+        316.51
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.5184,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 0.6,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.7329,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.1,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 4,
+      "timestamp": 0.6,
+      "bbox": [
+        0.0,
+        261.02,
+        54.77,
+        386.11
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.6949,
+      "frame_number": 7,
+      "center": [
+        27.39,
+        323.56
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.6949,
+      "behavior": {
+        "track_id": 4,
+        "timestamp": 0.6,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.4082,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.6,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 0.7,
+      "bbox": [
+        26.21,
+        174.63,
+        182.53,
+        403.14
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8528,
+      "frame_number": 8,
+      "center": [
+        104.37,
+        288.88
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8528,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 0.7,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.6923,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.7,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 0.7,
+      "bbox": [
+        174.52,
+        179.62,
+        272.73,
+        381.48
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8589,
+      "frame_number": 8,
+      "center": [
+        223.62,
+        280.55
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8589,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 0.7,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.2,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 0.7,
+      "bbox": [
+        539.32,
+        226.51,
+        640.0,
+        389.27
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.7553,
+      "frame_number": 8,
+      "center": [
+        589.66,
+        307.89
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.7553,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 0.7,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.6103,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.2,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 4,
+      "timestamp": 0.7,
+      "bbox": [
+        0.0,
+        266.91,
+        51.96,
+        386.29
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.5907,
+      "frame_number": 8,
+      "center": [
+        25.98,
+        326.6
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.5907,
+      "behavior": {
+        "track_id": 4,
+        "timestamp": 0.7,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5815,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.7,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 0.8,
+      "bbox": [
+        25.91,
+        174.71,
+        182.07,
+        402.64
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8614,
+      "frame_number": 9,
+      "center": [
+        103.99,
+        288.68
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8614,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 0.8,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.8094,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.0,
+        "transition": {
+          "from": "STANDING",
+          "to": "WALKING",
+          "timestamp": 0.8
+        },
+        "event": {
+          "type": "ACTIVITY_CHANGE",
+          "track_id": 1,
+          "timestamp": 0.8,
+          "confidence": 0.8094,
+          "severity": "LOW",
+          "reason": [
+            "Transitioned from STANDING to WALKING"
+          ],
+          "details": {
+            "from_activity": "STANDING",
+            "to_activity": "WALKING",
+            "previous_duration": 0.0
+          }
+        }
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 0.8,
+      "bbox": [
+        172.42,
+        179.08,
+        271.19,
+        382.15
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8969,
+      "frame_number": 9,
+      "center": [
+        221.81,
+        280.62
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8969,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 0.8,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.3,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 0.8,
+      "bbox": [
+        535.23,
+        214.07,
+        640.0,
+        388.89
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.7806,
+      "frame_number": 9,
+      "center": [
+        587.62,
+        301.48
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.7806,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 0.8,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5829,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.3,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 4,
+      "timestamp": 0.8,
+      "bbox": [
+        0.0,
+        272.28,
+        49.78,
+        386.91
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.418,
+      "frame_number": 9,
+      "center": [
+        24.89,
+        329.6
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.418,
+      "behavior": {
+        "track_id": 4,
+        "timestamp": 0.8,
+        "activity": "STANDING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5002,
+        "reason": null,
+        "previous_activity": null,
+        "duration": 0.8,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 0.9,
+      "bbox": [
+        24.71,
+        174.34,
+        181.42,
+        402.73
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8366,
+      "frame_number": 10,
+      "center": [
+        103.06,
+        288.54
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8366,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 0.9,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.8368,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.1,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 0.9,
+      "bbox": [
+        170.95,
+        179.29,
+        269.42,
+        381.57
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8948,
+      "frame_number": 10,
+      "center": [
+        220.19,
+        280.43
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8948,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 0.9,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.4,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 0.9,
+      "bbox": [
+        533.0,
+        207.86,
+        640.0,
+        389.2
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8411,
+      "frame_number": 10,
+      "center": [
+        586.5,
+        298.53
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8411,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 0.9,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.7408,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.4,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 1.0,
+      "bbox": [
+        22.51,
+        174.4,
+        179.45,
+        402.57
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8723,
+      "frame_number": 11,
+      "center": [
+        100.98,
+        288.49
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8723,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 1.0,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.8622,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.2,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 1.0,
+      "bbox": [
+        169.0,
+        179.36,
+        267.49,
+        381.36
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.872,
+      "frame_number": 11,
+      "center": [
+        218.25,
+        280.36
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.872,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 1.0,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.5,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 1.0,
+      "bbox": [
+        532.21,
+        206.78,
+        640.0,
+        388.79
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.5647,
+      "frame_number": 11,
+      "center": [
+        586.11,
+        297.79
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.5647,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 1.0,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.8416,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.5,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 1.1,
+      "bbox": [
+        20.44,
+        174.69,
+        177.53,
+        402.47
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8724,
+      "frame_number": 12,
+      "center": [
+        98.98,
+        288.58
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8724,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 1.1,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.8834,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.3,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 1.1,
+      "bbox": [
+        167.33,
+        179.61,
+        265.56,
+        380.78
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8698,
+      "frame_number": 12,
+      "center": [
+        216.44,
+        280.19
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8698,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 1.1,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.6,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 1.1,
+      "bbox": [
+        530.13,
+        200.93,
+        640.0,
+        389.3
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8007,
+      "frame_number": 12,
+      "center": [
+        585.07,
+        295.12
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8007,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 1.1,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.9296,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.6,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 1.2,
+      "bbox": [
+        15.75,
+        174.74,
+        172.57,
+        402.48
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8878,
+      "frame_number": 13,
+      "center": [
+        94.16,
+        288.61
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8878,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 1.2,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.9019,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.4,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 1.2,
+      "bbox": [
+        165.2,
+        178.79,
+        264.03,
+        381.15
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.846,
+      "frame_number": 13,
+      "center": [
+        214.61,
+        279.97
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.846,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 1.2,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.7,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 1.2,
+      "bbox": [
+        528.79,
+        196.81,
+        640.0,
+        388.84
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.841,
+      "frame_number": 13,
+      "center": [
+        584.39,
+        292.82
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.841,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 1.2,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.7,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 1.3,
+      "bbox": [
+        12.92,
+        174.63,
+        169.89,
+        403.02
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8738,
+      "frame_number": 14,
+      "center": [
+        91.4,
+        288.82
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8738,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 1.3,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.917,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.5,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 1.3,
+      "bbox": [
+        163.73,
+        178.93,
+        262.31,
+        380.86
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.7875,
+      "frame_number": 14,
+      "center": [
+        213.02,
+        279.89
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.7875,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 1.3,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.8,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 1.3,
+      "bbox": [
+        529.4,
+        199.66,
+        640.0,
+        389.15
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8636,
+      "frame_number": 14,
+      "center": [
+        584.7,
+        294.4
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8636,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 1.3,
+        "activity": "RUNNING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.7574,
+        "reason": null,
+        "previous_activity": "WALKING",
+        "duration": 0.0,
+        "transition": {
+          "from": "WALKING",
+          "to": "RUNNING",
+          "timestamp": 1.3
+        },
+        "event": {
+          "type": "ACTIVITY_CHANGE",
+          "track_id": 3,
+          "timestamp": 1.3,
+          "confidence": 0.7574,
+          "severity": "LOW",
+          "reason": [
+            "Transitioned from WALKING to RUNNING"
+          ],
+          "details": {
+            "from_activity": "WALKING",
+            "to_activity": "RUNNING",
+            "previous_duration": 0.0
+          }
+        }
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 1.4,
+      "bbox": [
+        11.08,
+        174.31,
+        167.4,
+        402.25
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8971,
+      "frame_number": 15,
+      "center": [
+        89.24,
+        288.28
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8971,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 1.4,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.769,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.6,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 1.4,
+      "bbox": [
+        161.57,
+        178.83,
+        260.45,
+        381.46
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.7933,
+      "frame_number": 15,
+      "center": [
+        211.01,
+        280.14
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.7933,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 1.4,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.9,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 1.4,
+      "bbox": [
+        529.28,
+        201.13,
+        640.0,
+        388.7
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8683,
+      "frame_number": 15,
+      "center": [
+        584.64,
+        294.91
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8683,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 1.4,
+        "activity": "RUNNING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5614,
+        "reason": null,
+        "previous_activity": "WALKING",
+        "duration": 0.1,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 1.5,
+      "bbox": [
+        8.25,
+        173.94,
+        164.17,
+        402.04
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8918,
+      "frame_number": 16,
+      "center": [
+        86.21,
+        287.99
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8918,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 1.5,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5787,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.7,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 1.5,
+      "bbox": [
+        159.22,
+        179.09,
+        257.95,
+        381.54
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.7914,
+      "frame_number": 16,
+      "center": [
+        208.58,
+        280.31
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.7914,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 1.5,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 1.0,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 1.5,
+      "bbox": [
+        526.01,
+        192.29,
+        640.0,
+        389.1
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8622,
+      "frame_number": 16,
+      "center": [
+        583.0,
+        290.69
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8622,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 1.5,
+        "activity": "RUNNING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5982,
+        "reason": null,
+        "previous_activity": "WALKING",
+        "duration": 0.2,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 1.6,
+      "bbox": [
+        7.27,
+        174.03,
+        163.06,
+        401.88
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8971,
+      "frame_number": 17,
+      "center": [
+        85.17,
+        287.95
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8971,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 1.6,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5793,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.8,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 1.6,
+      "bbox": [
+        156.72,
+        178.31,
+        255.89,
+        381.86
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.823,
+      "frame_number": 17,
+      "center": [
+        206.31,
+        280.09
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.823,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 1.6,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 1.1,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 1.6,
+      "bbox": [
+        522.3,
+        180.45,
+        640.0,
+        388.8
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8919,
+      "frame_number": 17,
+      "center": [
+        581.15,
+        284.62
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8919,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 1.6,
+        "activity": "RUNNING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.503,
+        "reason": null,
+        "previous_activity": "WALKING",
+        "duration": 0.3,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 1.7,
+      "bbox": [
+        6.43,
+        174.25,
+        162.49,
+        402.28
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8853,
+      "frame_number": 18,
+      "center": [
+        84.46,
+        288.26
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8853,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 1.7,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5071,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 0.9,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 1.7,
+      "bbox": [
+        154.74,
+        178.61,
+        253.33,
+        380.86
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8204,
+      "frame_number": 18,
+      "center": [
+        204.04,
+        279.74
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8204,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 1.7,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 1.2,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 1.7,
+      "bbox": [
+        520.92,
+        176.06,
+        640.0,
+        388.79
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8971,
+      "frame_number": 18,
+      "center": [
+        580.46,
+        282.43
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8971,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 1.7,
+        "activity": "RUNNING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5975,
+        "reason": null,
+        "previous_activity": "WALKING",
+        "duration": 0.4,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 1.8,
+      "bbox": [
+        5.38,
+        174.37,
+        161.26,
+        402.04
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8942,
+      "frame_number": 19,
+      "center": [
+        83.32,
+        288.21
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8942,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 1.8,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.5817,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 1.0,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 1.8,
+      "bbox": [
+        152.04,
+        178.87,
+        250.64,
+        380.99
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.7876,
+      "frame_number": 19,
+      "center": [
+        201.34,
+        279.93
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.7876,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 1.8,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 1.3,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 1.8,
+      "bbox": [
+        520.2,
+        174.59,
+        640.0,
+        388.49
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8934,
+      "frame_number": 19,
+      "center": [
+        580.1,
+        281.54
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8934,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 1.8,
+        "activity": "RUNNING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.6631,
+        "reason": null,
+        "previous_activity": "WALKING",
+        "duration": 0.5,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 1,
+      "timestamp": 1.9,
+      "bbox": [
+        3.48,
+        174.79,
+        158.86,
+        402.13
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.861,
+      "frame_number": 20,
+      "center": [
+        81.17,
+        288.46
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.861,
+      "behavior": {
+        "track_id": 1,
+        "timestamp": 1.9,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.641,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 1.1,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 2,
+      "timestamp": 1.9,
+      "bbox": [
+        150.36,
+        179.51,
+        248.74,
+        380.99
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8004,
+      "frame_number": 20,
+      "center": [
+        199.55,
+        280.25
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8004,
+      "behavior": {
+        "track_id": 2,
+        "timestamp": 1.9,
+        "activity": "WALKING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 1.0,
+        "reason": null,
+        "previous_activity": "STANDING",
+        "duration": 1.4,
+        "transition": null,
+        "event": null
+      }
+    },
+    {
+      "track_id": 3,
+      "timestamp": 1.9,
+      "bbox": [
+        519.18,
+        173.84,
+        640.0,
+        388.94
+      ],
+      "keypoints": null,
+      "detection_confidence": 0.8877,
+      "frame_number": 20,
+      "center": [
+        579.59,
+        281.39
+      ],
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8877,
+      "behavior": {
+        "track_id": 3,
+        "timestamp": 1.9,
+        "activity": "RUNNING",
+        "status": "NORMAL",
+        "severity": "NONE",
+        "confidence": 0.7158,
+        "reason": null,
+        "previous_activity": "WALKING",
+        "duration": 0.6,
+        "transition": null,
+        "event": null
+      }
+    }
+  ]
+}

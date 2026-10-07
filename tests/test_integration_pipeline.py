@@ -212,3 +212,23 @@ def test_person_tracker_process_video_with_behavior(temp_dir):
 
     assert data["metadata"]["behavior_engine_enabled"] is True
     assert "behavior_events" in data
+
+
+def test_behaviours_json_default_filename(shared_pipeline, temp_dir):
+    """Verify SentinelPipeline defaults to behaviours.json when no json path is provided."""
+    in_video = temp_dir / "input_default_json.mp4"
+    _create_synthetic_video(in_video, num_frames=3, width=320, height=240, fps=10.0)
+
+    summary = shared_pipeline.process_video(
+        input_path=in_video,
+    )
+    try:
+        # Check that the default json output ends with behaviours.json
+        assert summary["json_output_path"].endswith("behaviours.json")
+        assert Path(summary["json_output_path"]).exists()
+    finally:
+        out_vid = Path(summary["output_video_path"])
+        if out_vid.exists():
+            out_vid.unlink()
+
+

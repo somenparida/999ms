@@ -368,7 +368,7 @@ python run_sentinel.py --input autonomous-vision/data/input/multi_person.mp4 --o
 1. Tracks people using YOLO11n + ByteTrack with persistent track IDs.
 2. Evaluates kinematics, 8 activity classes, fall sequences, and ergonomics per track.
 3. Renders a combined video HUD with track IDs, activity labels, normality status badges (`NORMAL`, `POTENTIALLY_UNUSUAL`, `ABNORMAL`), velocity tags, and flashing alert banners.
-4. Exports comprehensive JSON telemetry combining tracking metadata and full behavioral records/events for Member 3/4.
+4. Exports comprehensive JSON telemetry combining tracking metadata and full behavioral records/events for Member 3/4 (saved by default to `output/behaviours.json` or `data/output/behaviours.json`).
 
 ---
 
@@ -410,10 +410,10 @@ for frame_num, timestamp, annotated_frame, records, events in pipeline.stream_vi
 
 ---
 
-### 4. Comprehensive Test Suite (79 Passing Tests)
+### 4. Comprehensive Test Suite (80 Passing Tests)
 
 ```powershell
-# Run Behavior Intelligence & Integration tests (60 tests)
+# Run Behavior Intelligence & Integration tests (61 tests)
 python -m pytest tests/ -v
 
 # Run Member 1 Detection & Tracking tests (19 tests)

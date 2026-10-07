@@ -243,7 +243,7 @@ class SentinelPipeline:
         if json_output_path is None:
             out_dir = _PROJECT_ROOT / "output"
             out_dir.mkdir(parents=True, exist_ok=True)
-            dst_json = out_dir / f"{src.stem}_sentinel.json"
+            dst_json = out_dir / "behaviours.json"
         else:
             dst_json = Path(json_output_path)
             dst_json.parent.mkdir(parents=True, exist_ok=True)
