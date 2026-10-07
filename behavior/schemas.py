@@ -212,6 +212,15 @@ class BehaviorResult:
     severity: Severity = Severity.NONE
     status_reason: Optional[str] = None
 
+    @property
+    def reasons(self) -> List[str]:
+        """Convenience property returning status reason or event reasons as a list."""
+        if self.status_reason:
+            return [self.status_reason]
+        if self.event and self.event.reason:
+            return list(self.event.reason)
+        return []
+
     def __getitem__(self, key: str) -> Any:
         """Enable dictionary-style access result['activity']."""
         if key == "duration":
