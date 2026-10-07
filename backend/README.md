@@ -1,88 +1,166 @@
-# Member 3 — Backend, PostgreSQL & Integration Layer
+# Autonomous Vision & Behaviour Understanding — Backend
 
-## HNX26PSI07 — Autonomous Vision & Behaviour Understanding
+**Member 3 Subsystem | HNX26PSI07 | HackNex 2026**
 
-This repository contains the complete backend and integration layer connecting Member 1 (Detection & Tracking), Member 2 (Behaviour Analysis & Anomaly Detection), Member 3 (Backend & Persistence), and Member 4 (Frontend Dashboard).
+> FastAPI + PostgreSQL + SQLAlchemy + Alembic integration backbone connecting Object Detection & Tracking (Member 1), Behaviour Intelligence (Member 2), and Interactive Dashboard UI (Member 4) into one coherent system.
 
 ---
 
-## 🚀 Getting Started
+## 📌 Executive Summary
 
-### 1. Environment Setup
+The **Backend & Integration Subsystem (Member 3)** acts as the central single source of truth for the entire application. It decouples machine learning modules from hardware and UI details by providing stable, validated data contracts.
 
-Create `.env` file or use defaults:
+```text
+  Member 1 (Detection & Tracking)
+                ↓
+    POST /api/videos/{id}/tracks/import
+                ↓
+            Member 3 (FastAPI + PostgreSQL)
+                ↓
+  Member 2 (Behaviour Intelligence)
+                ↓
+  POST /api/videos/{id}/behaviours/import
+                ↓
+     Automated Event Generation Engine
+                ↓
+        Evidence & Timeline Generator
+                ↓
+  Member 4 (Frontend Dashboard)
+```
+
+---
+
+## ⚡ Core Features & Capabilities
+
+- **Video Storage & Processing Lifecycle**: Upload video files to disk storage (`storage/videos`), track resolution, frame rate, duration, and manage live analysis job status (`queued`, `video_processing`, `detection`, `tracking`, `behaviour_analysis`, `completed`, `failed`).
+- **PostgreSQL & SQLAlchemy Relational Engine**: Relational schema covering `Video`, `Track`, `TrackPosition`, `Behaviour`, `Event`, `Evidence`, `AnalysisJob`, and `Zone`.
+- **Member 1 Integration (Tracking Data)**: Idempotent bulk import of object bounding boxes (`[x, y, w, h]` or `[x1, y1, x2, y2]`), frame timestamps, velocities, and 17 COCO pose keypoint skeletons.
+- **Member 2 Integration (Behaviour Intelligence)**: Receives activity classifications (`STANDING`, `WALKING`, `RUNNING`, `SITTING`, `CROUCHING`, `BENDING`, `LYING`, `FALLING`), posture durations, transitions, and normality ratings (`NORMAL`, `POTENTIALLY_UNUSUAL`, `ABNORMAL`).
+- **Automated Security Event Engine**: Automatically converts abnormal behaviors into structured alerts with severity levels (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`) and deduplication logic.
+- **Explainable Evidence Generation**: Automatically attaches multi-type evidence items: Bounding Box location, Trajectory path coordinates, and 17-Keypoint Skeleton Pose data.
+- **Dashboard & Timeline Aggregations (Member 4)**: Calculates 7 real-time KPI metrics (People Detected, Unique Tracks, Normal Events, Abnormal Events, High-Risk Events, Average Confidence %, Duration) and chronological timeline feeds.
+- **Restricted Zone Configurator**: CRUD polygon boundaries for spatial rule checking.
+- **Multi-Laptop Networking & CORS Support**: Configured to run across different laptops on the same Wi-Fi network or over public tunnels (`ngrok`).
+- **Automated Test Suite**: 8 comprehensive `pytest` test suites verifying unit logic, API endpoints, idempotency, and full end-to-end integration flows.
+
+---
+
+## 🚀 Quickstart & Setup
+
+### 1. Environment Configuration
+
+Copy the sample environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-### 2. Local Execution (SQLite / PostgreSQL)
+Default configuration in `.env`:
+```env
+DATABASE_URL=sqlite:///./vision_behaviour.db
+UPLOAD_DIR=./storage/videos
+OUTPUT_DIR=./storage/processed
+EVIDENCE_DIR=./storage/evidence
+CORS_ORIGINS=["*"]
+DEBUG=true
+```
 
-Install dependencies and run Uvicorn dev server:
+### 2. Run Server Locally (SQLite / Dev Mode)
+
+Install dependencies and start Uvicorn with auto-IP output:
 
 ```bash
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+./start_server.sh
 ```
 
-Access Swagger UI: `http://localhost:8000/docs`
-Access Healthcheck: `http://localhost:8000/health`
+Or start manually with Uvicorn:
 
-### 3. Docker Deployment
+```bash
+python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
 
-Run complete environment with PostgreSQL and FastAPI container:
+- **Interactive Swagger Documentation**: `http://localhost:8000/docs`
+- **System Health Check**: `http://localhost:8000/health`
+
+### 3. Run with Docker Compose (PostgreSQL 15 + FastAPI)
+
+To launch production-grade PostgreSQL 15 container alongside the backend:
 
 ```bash
 docker compose up --build
 ```
 
----
-
-## 🧪 Testing
-
-Run test suite with pytest:
-
-```bash
-pytest
-```
-
-Includes end-to-end integration test (`tests/test_integration.py`):
-`Track Data -> Behaviour Data -> Event Generation -> Evidence Attachment -> API Retrieval`.
+PostgreSQL database will run on port `5432` and backend API on port `8000`.
 
 ---
 
-## 📡 API Contracts
+## 🌐 Connecting Teammates Across Laptops
+
+When team members are on different laptops on the same Wi-Fi / Hotspot:
+
+1. Find your local IP address (`hostname -I`).
+2. Run `./start_server.sh` (or `python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000`).
+3. Teammates connect using `http://<YOUR_LOCAL_IP>:8000`:
+
+| Teammate | Endpoint / Contract |
+| :--- | :--- |
+| **Member 1 (Tracking)** | `POST http://<YOUR_IP>:8000/api/videos/{video_id}/tracks/import` |
+| **Member 2 (Behaviour)** | `POST http://<YOUR_IP>:8000/api/videos/{video_id}/behaviours/import` |
+| **Member 4 (Frontend)** | Base URL: `http://<YOUR_IP>:8000/api` |
+| **Swagger Docs** | `http://<YOUR_IP>:8000/docs` |
+
+*For detailed networking instructions, see [`README_MULTI_LAPTOP_CONNECT.md`](file:///home/frost/hacknex/README_MULTI_LAPTOP_CONNECT.md).*
+
+---
+
+## 📡 API Reference Summary
+
+### Videos & Analysis
+- `POST /api/videos/upload` — Upload MP4 video file
+- `GET /api/videos` — List all uploaded videos
+- `GET /api/videos/{id}` — Get single video details
+- `DELETE /api/videos/{id}` — Delete video
+- `POST /api/videos/{id}/analyze` — Start analysis job
+- `GET /api/videos/{id}/analysis` — Poll analysis progress percentage & current stage
 
 ### Member 1: Track Import
-`POST /api/videos/{video_id}/tracks/import`
+- `POST /api/videos/{id}/tracks/import` — Import track positions & 17 COCO keypoints
+- `GET /api/videos/{id}/tracks` — Get all detected tracks
+- `GET /api/videos/{id}/tracks/{track_id}/positions` — Get position time-series
 
 ### Member 2: Behaviour Import
-`POST /api/videos/{video_id}/behaviours/import`
+- `POST /api/videos/{id}/behaviours/import` — Import activity classifications & triggers Event Engine
+- `GET /api/videos/{id}/behaviours` — List behaviours
 
-### Member 4: Dashboard Endpoints
-- `GET /api/videos/{video_id}/timeline`
-- `GET /api/videos/{video_id}/summary`
-- `GET /api/videos/{video_id}/events`
-- `GET /api/events/{event_id}/evidence`
+### Events & Evidence
+- `GET /api/videos/{id}/events` — List abnormal security events
+- `GET /api/events/{id}` — Get single event details
+- `PATCH /api/events/{id}` — Update event status (`reviewed`, `confirmed`, `dismissed`)
+- `GET /api/events/{id}/evidence` — Get bounding box, trajectory, and skeleton keypoints evidence
+
+### Member 4: Dashboard Aggregations
+- `GET /api/videos/{id}/summary` — Fetch 7 KPI metrics
+- `GET /api/videos/{id}/timeline` — Fetch chronological timestamped activity feed
+- `POST /api/zones` / `GET /api/videos/{id}/zones` — Create & list restricted zone polygons
 
 ---
 
-## 🎨 Member 4 — Frontend Dashboard AI Prompt
+## 🧪 Testing Suite
 
-To build the dynamic frontend dashboard for Member 4 using AI agents (React, Next.js, or Vite + Tailwind CSS), pass the complete system prompt stored in [`MEMBER_4_FRONTEND_PROMPT.md`](file:///home/frost/hacknex/backend/MEMBER_4_FRONTEND_PROMPT.md):
+Run all unit, API, and integration test suites:
 
-```text
-You are an expert Principal Frontend Engineer building the interactive Dashboard UI for HNX26PSI07: Autonomous Vision & Behaviour Understanding.
-
-Your goal is to build a sleek, high-performance web dashboard (React / Next.js / Vite + Tailwind CSS) that connects directly to the Member 3 FastAPI + PostgreSQL backend running at http://localhost:8000/api.
-
-Key Dashboard Features to Implement:
-1. Video Upload & Player Canvas: Drag & drop upload, HTML5 player with dynamic canvas bounding box overlay synchronized with video timestamp.
-2. KPI Metric Cards: Display statistics from GET /api/videos/{video_id}/summary (People Detected, Unique Tracks, Normal Events, Abnormal Events, High-Risk Events, Avg Confidence, Duration).
-3. Live Analysis Progress Bar: Poll GET /api/videos/{video_id}/analysis showing live percentage and active stage.
-4. Security Alerts Feed: Display events from GET /api/videos/{video_id}/events with severity badges (CRITICAL, HIGH, MEDIUM, LOW) and status update actions (PATCH /api/events/{event_id}).
-5. Evidence Drawer: Modal showing WHO, WHAT, WHEN, CONFIDENCE, WHY, bounding box coordinates, and trajectory path from GET /api/events/{event_id}/evidence.
-6. Chronological Timeline: Interactive feed from GET /api/videos/{video_id}/timeline with click-to-seek video playback.
-7. Zone Configurator: Interactive zone polygon manager connecting to POST /api/zones and GET /api/videos/{video_id}/zones.
+```bash
+pytest -v
 ```
 
+Includes End-to-End integration test (`tests/test_integration.py`) verifying:
+$$\text{Video Upload} \rightarrow \text{Track Import} \rightarrow \text{Behaviour Import} \rightarrow \text{Auto Event Generation} \rightarrow \text{Evidence Attachment} \rightarrow \text{Dashboard API Retrieval}$$
+
+---
+
+## 🎨 Member 4 Frontend AI Prompt
+
+For Member 4 to generate the dynamic React/Next.js/Vite frontend dashboard using AI coders, refer to:
+- Prompt Guide: [`MEMBER_4_FRONTEND_PROMPT.md`](file:///home/frost/hacknex/backend/MEMBER_4_FRONTEND_PROMPT.md)
+- Frontend Spec: [`README_MEMBER_4_FRONTEND.md`](file:///home/frost/hacknex/README_MEMBER_4_FRONTEND.md)
