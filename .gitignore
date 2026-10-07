@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+.venv
+
+# Database & SQLite
+*.db
+*.sqlite
+*.sqlite3
+test_vision.db
+vision_behaviour.db
+
+# Storage / Uploaded files
+backend/storage/videos/*
+backend/storage/processed/*
+backend/storage/evidence/*
+backend/storage/event_clips/*
+!backend/storage/videos/.gitkeep
+!backend/storage/processed/.gitkeep
+!backend/storage/evidence/.gitkeep
+!backend/storage/event_clips/.gitkeep
+
+# Pytest & IDE
+.pytest_cache/
+.coverage
+htmlcov/
+.vscode/
+.idea/
+
+# Environment files
+.env

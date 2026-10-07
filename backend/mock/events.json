@@ -1,0 +1,55 @@
+{
+  "events": [
+    {
+      "event_type": "restricted_area_entry",
+      "severity": "high",
+      "start_time": 42.31,
+      "end_time": 55.82,
+      "confidence": 0.94,
+      "reason": "Person #7 entered restricted zone.",
+      "status": "detected",
+      "evidence": [
+        {
+          "evidence_type": "bounding_box",
+          "timestamp": 42.31,
+          "frame_number": 1269,
+          "description": "Bounding box at zone entry point",
+          "metadata": {
+            "bbox": [120, 80, 100, 270],
+            "center": [170, 215]
+          }
+        },
+        {
+          "evidence_type": "trajectory",
+          "timestamp": 42.31,
+          "frame_number": 1269,
+          "description": "Path crossed zone perimeter",
+          "metadata": {
+            "trajectory": [[130, 275, 12.2], [170, 215, 42.31], [200, 225, 55.82]]
+          }
+        }
+      ]
+    },
+    {
+      "event_type": "prolonged_inactivity",
+      "severity": "medium",
+      "start_time": 60.00,
+      "end_time": 120.00,
+      "confidence": 0.89,
+      "reason": "Person #7 remained stationary in monitored area.",
+      "status": "detected",
+      "evidence": [
+        {
+          "evidence_type": "bounding_box",
+          "timestamp": 60.00,
+          "frame_number": 1800,
+          "description": "Stationary location bounding box",
+          "metadata": {
+            "bbox": [150, 90, 100, 270],
+            "center": [200, 225]
+          }
+        }
+      ]
+    }
+  ]
+}
