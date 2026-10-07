@@ -43,75 +43,99 @@ class FallDetector:
         Returns:
             (detected, fall_score, reasons, event)
         """
-        if len(history) < 4:
+        # 1. Require sufficient history to avoid tracker initialization jitter
+        if len(history) < 5 or (history.timestamps[-1] - history.timestamps[0]) < 0.25:
             return False, 0.0, [], None
 
         cur_time = history.timestamps[-1]
 
-        # Check cooldown
+        # 2. Check cooldown
         if track_id in self._last_fall_time:
             if cur_time - self._last_fall_time[track_id] < self.config.cooldown_seconds:
                 return False, 0.0, ["Fall detection cooldown active"], None
 
-        # Filter observations within the detection window
+        # 3. Filter observations within the detection window
         window_start = cur_time - self.config.detection_window_seconds
         timestamps = list(history.timestamps)
         indices = [i for i, t in enumerate(timestamps) if t >= window_start]
-        if len(indices) < 4:
+        if len(indices) < 5:
             return False, 0.0, [], None
 
-        # 1. Evaluate downward vertical velocity spike
-        vert_vels = [history.vertical_velocities[i] for i in indices]
-        max_downward_vy = float(np.max(vert_vels))
-
-        vy_thresh = self.config.min_downward_velocity
-        if max_downward_vy >= vy_thresh:
-            s_vertical = min(1.0, max_downward_vy / (vy_thresh * 1.5))
-        else:
-            s_vertical = max(0.0, max_downward_vy / vy_thresh * 0.5)
-
-        # 2. Evaluate acceleration spike during the descent
-        accels = [history.accelerations[i] for i in indices]
-        max_accel = float(np.max(np.abs(accels)))
-        accel_thresh = self.config.min_downward_acceleration
-        if max_accel >= accel_thresh:
-            s_accel = min(1.0, max_accel / (accel_thresh * 1.5))
-        else:
-            s_accel = max(0.0, max_accel / accel_thresh * 0.5)
-
-        # 3. Evaluate posture change (aspect ratio / height collapse)
-        # Compare early window bounding boxes/poses to latest
-        half = max(1, len(indices) // 2)
+        # Split window into early (pre-fall baseline) and late (impact/posture collapse)
+        half = max(2, len(indices) // 2)
         early_indices = indices[:half]
         late_indices = indices[half:]
 
-        early_ars = [history.bboxes[i].aspect_ratio for i in early_indices]
-        late_ars = [history.bboxes[i].aspect_ratio for i in late_indices]
+        latest_bbox = history.bboxes[-1]
+        early_bboxes = [history.bboxes[i] for i in early_indices]
+        late_bboxes = [history.bboxes[i] for i in late_indices]
 
-        mean_early_ar = float(np.mean(early_ars))
-        mean_late_ar = float(np.mean(late_ars))
+        # 4. Posture and vertical extent analysis
+        mean_early_ar = float(np.mean([b.aspect_ratio for b in early_bboxes]))
+        mean_late_ar = float(np.mean([b.aspect_ratio for b in late_bboxes]))
+        mean_early_h = float(np.mean([b.height for b in early_bboxes]))
+        mean_late_h = float(np.mean([b.height for b in late_bboxes]))
 
-        # Check if subject was originally upright and is now horizontal
         ar_ratio = mean_late_ar / max(0.1, mean_early_ar)
+        height_ratio = mean_late_h / max(1.0, mean_early_h)
 
-        # Also check torso inclination change if pose is available
+        # Check torso inclination if pose is available
         torso_collapsed = False
-        if pose.available and pose.torso_angle_deg >= 55.0:
+        if pose.available and pose.torso_angle_deg >= 50.0:
             torso_collapsed = True
 
         posture_thresh = self.config.posture_change_ratio_min
-        if ar_ratio >= posture_thresh or torso_collapsed:
-            s_posture = min(1.0, 0.6 + 0.4 * (ar_ratio / posture_thresh))
-        else:
-            s_posture = max(0.0, (ar_ratio - 1.0) / (posture_thresh - 1.0)) if posture_thresh > 1.0 else 0.0
+        aspect_ratio_collapsed = (ar_ratio >= posture_thresh) or (mean_early_ar <= 0.75 and latest_bbox.aspect_ratio >= 0.90)
+        height_collapsed = (height_ratio <= 0.70)
+        has_collapsed_posture = aspect_ratio_collapsed or height_collapsed or torso_collapsed
 
-        # 4. Evaluate post-fall stability (cessation of significant movement)
+        # STRICT VETO 1: Upright posture veto
+        # If the person is still an upright vertical rectangle without significant height loss or torso tilt
+        if not has_collapsed_posture and latest_bbox.aspect_ratio <= 0.75 and height_ratio > 0.78:
+            return False, 0.0, [], None
+
+        # STRICT VETO 2: Active running / high continuous motion veto
+        # A fallen person does not continue sprinting across the camera view
         recent_vel = motion.recent_velocity
+        current_vel = motion.pixel_velocity
+        if (recent_vel > 22.0 or current_vel > 26.0) and latest_bbox.aspect_ratio < 0.95 and not torso_collapsed:
+            return False, 0.0, [], None
+
+        # 5. Evaluate downward vertical velocity spike
+        vert_vels = [history.vertical_velocities[i] for i in indices]
+        max_downward_vy = float(np.max(vert_vels))
+        vy_thresh = self.config.min_downward_velocity
+
+        if max_downward_vy >= vy_thresh:
+            s_vertical = min(1.0, max_downward_vy / (vy_thresh * 1.5))
+        else:
+            s_vertical = max(0.0, max_downward_vy / vy_thresh * 0.4)
+
+        # 6. Evaluate acceleration spike during the descent
+        accels = [history.accelerations[i] for i in indices]
+        max_accel = float(np.max(np.abs(accels)))
+        accel_thresh = self.config.min_downward_acceleration
+
+        if max_accel >= accel_thresh:
+            s_accel = min(1.0, max_accel / (accel_thresh * 1.5))
+        else:
+            s_accel = max(0.0, max_accel / accel_thresh * 0.4)
+
+        # 7. Posture collapse score
+        if has_collapsed_posture:
+            collapse_magnitude = max(ar_ratio / posture_thresh, (1.0 - height_ratio) / 0.35)
+            s_posture = min(1.0, 0.65 + 0.35 * min(1.0, collapse_magnitude))
+        else:
+            s_posture = 0.0
+
+        # 8. Post-fall stability (cessation of significant movement)
         vel_max = self.config.post_fall_velocity_max
         if recent_vel <= vel_max:
             s_post_fall = min(1.0, 1.0 - (recent_vel / (vel_max * 2.0)))
+        elif recent_vel <= vel_max * 2.0:
+            s_post_fall = max(0.0, 1.0 - (recent_vel / (vel_max * 2.0)))
         else:
-            s_post_fall = max(0.0, 1.0 - (recent_vel / (vel_max * 3.0)))
+            s_post_fall = 0.0
 
         # Composite score
         w = self.config.weights
@@ -129,16 +153,22 @@ class FallDetector:
             reasons.append(f"rapid downward movement ({max_downward_vy:.1f} px/s >= {vy_thresh:.1f})")
         if max_accel >= accel_thresh:
             reasons.append(f"impact acceleration spike ({max_accel:.1f} px/s² >= {accel_thresh:.1f})")
-        if ar_ratio >= posture_thresh or torso_collapsed:
-            reasons.append(f"posture transition to horizontal (aspect ratio change {mean_early_ar:.2f} -> {mean_late_ar:.2f})")
+        if has_collapsed_posture:
+            reasons.append(f"posture collapse to horizontal (aspect ratio change {mean_early_ar:.2f} -> {mean_late_ar:.2f}, height ratio {height_ratio:.2f})")
         if recent_vel <= vel_max:
             reasons.append(f"low post-fall movement ({recent_vel:.1f} px/s <= {vel_max:.1f})")
 
-        # Threshold check
+        # Threshold check:
+        # A genuine fall MUST have confirmed posture collapse AND kinetic descent/impact AND fall_score >= threshold
         detected = False
         event: Optional[BehaviorEvent] = None
 
-        if fall_score >= self.config.possible_fall_threshold and len(reasons) >= 2:
+        if (
+            has_collapsed_posture
+            and (max_downward_vy >= vy_thresh or max_accel >= accel_thresh)
+            and fall_score >= self.config.possible_fall_threshold
+            and len(reasons) >= 2
+        ):
             detected = True
             self._last_fall_time[track_id] = cur_time
 
@@ -160,6 +190,7 @@ class FallDetector:
                     "max_downward_velocity": round(max_downward_vy, 2),
                     "max_acceleration": round(max_accel, 2),
                     "aspect_ratio_change": round(ar_ratio, 2),
+                    "height_ratio": round(height_ratio, 2),
                     "post_fall_velocity": round(recent_vel, 2),
                     "composite_fall_score": fall_score,
                 },
