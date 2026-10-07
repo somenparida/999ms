@@ -1,29 +1,47 @@
 # Warehouse Sentinel - Behavior Intelligence Subsystem
-**Member 2 Component | HackNex 2026**
+**Member 2 Subsystem | HackNex 2026**
 
-Real-time human activity understanding, posture tracking, temporal state modeling, and safety event detection for automated warehouse video surveillance.
-
----
-
-## 1. Overview & Purpose
-
-The **Behavior Intelligence Subsystem** is Member 2's core component in the **Warehouse Sentinel** platform. Its sole responsibility is to translate low-level tracked person observations (`track_id`, timestamps, bounding boxes, detection confidences, and optional keypoint skeletons) into high-level, temporal human activity states, meaningful transitions, and safety events (e.g., slip-and-fall incidents, prolonged worker inactivity).
-
-### Key Architectural Tenets
-- **Completely Decoupled from Detection/Tracking**: Zero internal dependency on YOLO, ByteTrack, or GPU inference. Can run anywhere with lightweight CPU compute ($< 0.5$ ms per update).
-- **Temporal Analysis**: No single-frame snap judgments. Behavior is understood across sliding temporal windows using true timestamps (supporting variable frame rates and dropped frames).
-- **Explainable & Configurable**: 100% rule-based and deterministic baseline driven by YAML configuration—no magic numbers in code.
-- **Graceful Degradation**: Operates on bounding-box kinematics alone when pose keypoints are missing or occluded.
-- **Future ML Ready**: Base classifier interface enables drop-in replacement with LSTM/GRU/TCN models without modifying downstream consumers.
+> Real-time, explainable human activity understanding, posture tracking, ergonomic risk assessment, and safety anomaly intelligence from continuous video surveillance.
 
 ---
 
-## 2. Pipeline Architecture
+## 📌 Executive Summary: What This Module Does
+
+The **Behavior Intelligence Subsystem** serves as the cognitive reasoning core for **Warehouse Sentinel**. 
+
+While upstream **Member 1 (Detection & Tracking)** detects people and tracks bounding boxes/poses frame-by-frame, and downstream **Member 3/4 (Dashboard & Alerting)** handles visualization and notification dispatch, **this subsystem (Member 2)** bridges the gap by answering three vital operational questions over time:
+1. **WHAT is the person doing?** (Classifying actions such as walking, standing, sitting, crouching, bending, running, or falling).
+2. **IS IT NORMAL OR ABNORMAL?** (Evaluating whether the action or its duration constitutes an operational, ergonomic, or emergency safety hazard in a warehouse).
+3. **WHY?** (Providing deterministic, transparent evidence: velocities, joint angles, duration metrics, and kinematic transition sequences).
+
+It operates completely **decoupled from YOLO and GPU hardware**—running entirely on CPU in $< 0.5$ ms per update, handling variable frame rates, missing frames, and occlusions gracefully.
+
+---
+
+## ⚡ Feature Summary at a Glance
+
+| Feature Category | Capabilities & Implementation |
+| :--- | :--- |
+| **8 Activity Recognition Classes** | Deterministic, explainable classification of `STANDING`, `WALKING`, `RUNNING`, `SITTING`, `CROUCHING`, `BENDING`, `LYING`, and `FALLING` (plus `UNKNOWN` for low-confidence inputs). |
+| **Normal vs. Abnormal Intelligence** | Decoupled normality layer classifying behavior into `NORMAL`, `POTENTIALLY_UNUSUAL`, or `ABNORMAL` based on activity type, duration, and sequence context. |
+| **Ergonomic & Inactivity Monitoring** | Automatically flags sustained bending ($> 30$s, repetitive lifting risk), prolonged crouching ($> 30$s), and general inactivity ($> 60$s) with cautious, non-medical terminology. |
+| **Multi-Stage Temporal Fall Detection** | Evaluates a 4-phase kinetic trajectory (rapid downward drop $\ge 40$ px/s $\to$ acceleration impact spike $\ge 30$ px/s² $\to$ aspect ratio collapse $\ge 1.4\times \to$ post-fall stillness). |
+| **Post-Fall Sequence Reasoning** | Distinguishes ordinary intentional lying down (`NORMAL`) from critical fall consequences (`FALLING` $\to$ `LYING` $\to$ `ABNORMAL` / `HIGH` severity). |
+| **Temporal Smoothing & Hysteresis** | Recency-weighted majority voting across sliding windows eliminates single-frame flicker and prevents duplicate transition alert flooding. |
+| **Biomechanical Pose Analysis** | Vector angle calculations on COCO 17-keypoint skeletons (torso inclination, knee flexion, hip angles, and hip-to-ankle vertical drop ratio). |
+| **Graceful Motion-Only Fallback** | Seamlessly falls back to bounding-box aspect ratios and kinematics when pose keypoints are missing or occluded. |
+| **Independent Per-Track Buffering** | Independent rolling histories per track with automatic stale track eviction and bounded memory consumption. |
+| **Zero YOLO / GPU Coupling** | Runs 100% offline without PyTorch or CUDA. Includes pure Python synthetic data generators for standalone development and testing. |
+| **Automated Test & Simulation Suite** | **54 passing automated tests** (0.3s runtime), 7 standalone CLI simulations, and an OpenCV MP4 video generator. |
+
+---
+
+## 🏗️ Pipeline Architecture
 
 ```mermaid
 graph TD
     subgraph Member1[Member 1: Detection & Tracking]
-        M1Out["[track_id, timestamp, bbox, conf, optional keypoints]"]
+        M1Out["Input: [track_id, timestamp, bbox, conf, optional keypoints]"]
     end
 
     subgraph BehaviorIntelligence[Member 2: Behavior Intelligence Engine]
@@ -34,8 +52,8 @@ graph TD
         TS[Temporal Smoothing\nRecency-weighted majority voting]
         FD[Fall Detector\nMulti-stage temporal kinetic analysis]
         SM[Activity State Machine\nHysteresis, duration & transition tracking]
-        BE[Behavior Event Engine\nACTIVITY_CHANGE, POSSIBLE_FALL, INACTIVITY]
-        BR[BehaviorResult Container\nTyped dataclass / JSON serialization]
+        NL[Normality Intelligence Layer\nbehavior/normality.py]
+        BR[BehaviorResult Container\nTyped dataclass / JSON output]
     end
 
     subgraph Downstream[Member 3/4: Dashboard & Alerting]
@@ -53,34 +71,34 @@ graph TD
     PF --> FD
     TS --> SM
     FD --> SM
-    FD --> BE
-    SM --> BE
-    SM --> BR
-    BE --> BR
+    SM --> NL
+    NL --> BR
     BR --> Consumers
 ```
 
 ---
 
-## 3. Contracts & API Interface
+## 📋 API Contracts & Interfaces
 
-### Input Contract (Member 1 $\to$ Member 2)
+### 1. Input Contract (Member 1 $\to$ Member 2)
 
-Member 1 passes bounding boxes and optional 17-keypoint COCO poses per detected person.
+Member 1 feeds tracked bounding boxes and optional 17-keypoint COCO poses per person:
 
-#### Minimum Input (Motion-Only):
 ```python
-result = behavior_engine.update(
+from behavior.behavior_engine import BehaviorEngine
+
+engine = BehaviorEngine("configs/behavior.yaml")
+
+# Minimal Input (Motion-Only):
+result = engine.update(
     track_id=7,
-    timestamp=12.4,                  # Monotonic seconds
-    bbox=[100.0, 150.0, 160.0, 310.0], # [x1, y1, x2, y2]
-    detection_confidence=0.94        # [0.0 - 1.0]
+    timestamp=12.4,                     # Monotonic timestamp in seconds
+    bbox=[100.0, 150.0, 160.0, 310.0],    # [x1, y1, x2, y2]
+    detection_confidence=0.94           # [0.0 - 1.0]
 )
-```
 
-#### Preferred Input (Motion + Keypoint Pose):
-```python
-result = behavior_engine.update(
+# Preferred Input (Motion + Keypoints):
+result = engine.update(
     track_id=7,
     timestamp=12.4,
     bbox=[100.0, 150.0, 160.0, 310.0],
@@ -96,17 +114,20 @@ result = behavior_engine.update(
 
 ---
 
-### Output Contract (Member 2 $\to$ Member 3/4)
+### 2. Output Contract (Member 2 $\to$ Member 3/4)
 
-The engine returns a strongly typed `BehaviorResult` object (or structured JSON via `result.to_dict()`):
+The engine returns a strongly typed `BehaviorResult` (serializable via `result.to_dict()`):
 
-#### Standard Activity Observation
+#### Normal Activity Output:
 ```json
 {
   "track_id": 7,
   "timestamp": 12.4,
   "activity": "WALKING",
+  "status": "NORMAL",
+  "severity": "NONE",
   "confidence": 0.92,
+  "reason": null,
   "previous_activity": "STANDING",
   "duration": 4.8,
   "transition": {
@@ -118,13 +139,33 @@ The engine returns a strongly typed `BehaviorResult` object (or structured JSON 
 }
 ```
 
-#### Fall Incident Alert
+#### Potentially Unusual Ergonomic Risk:
+```json
+{
+  "track_id": 4,
+  "timestamp": 42.0,
+  "activity": "BENDING",
+  "status": "POTENTIALLY_UNUSUAL",
+  "severity": "LOW",
+  "confidence": 0.88,
+  "reason": "Prolonged bending",
+  "previous_activity": "WALKING",
+  "duration": 42.0,
+  "transition": null,
+  "event": null
+}
+```
+
+#### Critical Fall Incident Alert:
 ```json
 {
   "track_id": 7,
   "timestamp": 52.7,
   "activity": "FALLING",
+  "status": "ABNORMAL",
+  "severity": "HIGH",
   "confidence": 0.94,
+  "reason": "Possible fall detected",
   "previous_activity": "WALKING",
   "duration": 0.0,
   "transition": {
@@ -143,97 +184,54 @@ The engine returns a strongly typed `BehaviorResult` object (or structured JSON 
       "impact acceleration spike (600.0 px/s² >= 30.0)",
       "posture transition to horizontal",
       "low post-fall movement"
-    ],
-    "details": {
-      "max_downward_velocity": 60.0,
-      "max_acceleration": 600.0,
-      "aspect_ratio_change": 2.45,
-      "post_fall_velocity": 2.1,
-      "composite_fall_score": 0.94
-    }
+    ]
   }
 }
 ```
 
 ---
 
-## 4. Activity Classes & Classification Logic
+## 🏃 Activity Classes & Postural Discriminators
 
-| Activity | Kinematic & Posture Profile | Key Discriminators |
+| Activity | Kinematic & Posture Profile | Key Discriminator |
 | :--- | :--- | :--- |
-| `STANDING` | Upright posture ($W/H < 0.75$, torso angle $< 35^\circ$), low velocity ($\le 8$ px/s). | Distinguishable from sitting via straight knee angle ($> 135^\circ$). |
-| `WALKING` | Upright posture, moderate velocity ($6 - 28$ px/s). | Continuous directional displacement. |
-| `RUNNING` | Upright posture, high velocity ($> 26$ px/s), acceleration bursts ($> 15$ px/s²). | Sustained high pixel velocity and higher trajectory variance. |
-| `SITTING` | Upright torso ($< 35^\circ$), bent knees ($< 135^\circ$), low velocity ($\le 8$ px/s). | Lower hip vertical position at chair height. |
-| `CROUCHING` | Low velocity, deep knee flexion ($< 115^\circ$), hips dropped low close to ankles ($< 0.35$ body height). | Squatting posture, distinguishing from sitting by hip height near ground. |
-| `BENDING` | Low velocity, forward-tilted torso ($35^\circ - 75^\circ$ from vertical), straight legs ($> 130^\circ$). | Stooping at the waist for lifting/inspection while standing on feet. |
-| `LYING` | Horizontal body orientation ($W/H > 1.15$, torso angle $> 60^\circ$), low velocity ($\le 6$ px/s). | Wide aspect ratio without rapid downward descent. |
-| `FALLING` | Standing/Walking $\to$ downward velocity spike $\to$ impact $\to$ horizontal stillness. | Multi-stage temporal sequence detected by FallDetector. |
-| `UNKNOWN` | Low detection confidence ($< 0.45$), occlusion, or ambiguous cues. | Prevents false positives under degraded sensor quality. |
+| **`STANDING`** | Upright torso ($< 35^\circ$), straight legs ($> 135^\circ$), low velocity ($\le 8$ px/s). | Distinguishable from sitting/crouching via straight knee angles. |
+| **`WALKING`** | Upright posture, moderate velocity ($6 - 28$ px/s). | Continuous directional displacement. |
+| **`RUNNING`** | Upright posture, high velocity ($> 26$ px/s), acceleration bursts ($> 15$ px/s²). | Sustained high pixel velocity and trajectory variance. |
+| **`SITTING`** | Upright torso ($< 35^\circ$), bent knees ($< 135^\circ$), low velocity ($\le 8$ px/s). | Hips elevated at chair height ($> 0.35$ vertical extent). |
+| **`CROUCHING`** | Low velocity, deep knee flexion ($< 115^\circ$), hips dropped near ankles ($\le 0.35$ vertical extent). | Deep squatting posture, distinguishable from sitting by low hip height. |
+| **`BENDING`** | Low velocity, forward-tilted torso ($35^\circ - 75^\circ$ from vertical), straight legs ($> 130^\circ$). | Stooping at the waist for lifting/inspection while standing on feet. |
+| **`LYING`** | Horizontal body orientation ($W/H > 1.15$, torso angle $> 60^\circ$), low velocity ($\le 6$ px/s). | Horizontally recumbent across floor without rapid descent spike. |
+| **`FALLING`** | Standing/Walking $\to$ downward velocity spike $\to$ impact $\to$ horizontal stillness. | Multi-stage temporal sequence evaluated by FallDetector. |
+| **`UNKNOWN`** | Low detection confidence ($< 0.45$), occlusion, or ambiguous cues. | Prevents false positives under degraded sensor quality. |
 
 ---
 
-## 4.1 Normal vs. Abnormal Intelligence Layer (`behavior/normality.py`)
+## 🛡️ Normality Intelligence Layer (`behavior/normality.py`)
 
-Activities themselves are not inherently abnormal. The system translates recognized activities and temporal context into explainable normality statuses:
+Activities themselves are not inherently abnormal. The normality layer evaluates whether a posture is acceptable or concerning:
 
-```text
-STANDING   → NORMAL (Severity: NONE)
-WALKING    → NORMAL (Severity: NONE)
-RUNNING    → NORMAL (Severity: NONE)
-SITTING    → NORMAL (Severity: NONE)
-CROUCHING  → NORMAL (if duration <= 30s) / POTENTIALLY_UNUSUAL (if > 30s, Severity: LOW)
-BENDING    → NORMAL (if duration <= 30s) / POTENTIALLY_UNUSUAL (if > 30s, Severity: LOW)
-LYING      → NORMAL (if duration <= 30s) / POTENTIALLY_UNUSUAL (if > 30s, Severity: LOW)
-FALLING    → ABNORMAL (Severity: HIGH, Reason: "Possible fall detected")
-FALLING → LYING → ABNORMAL (Severity: HIGH, Reason: "Lying following a fall")
-UNKNOWN    → UNKNOWN (Severity: NONE)
-```
-
-Structured output per person:
-```json
-{
-  "track_id": 7,
-  "activity": "BENDING",
-  "status": "POTENTIALLY_UNUSUAL",
-  "severity": "LOW",
-  "confidence": 0.92,
-  "reason": "Prolonged bending"
-}
-```
+| Activity | Condition | Status | Severity | Reason |
+| :--- | :--- | :--- | :--- | :--- |
+| **`STANDING`** | Any duration | `NORMAL` | `NONE` | `None` |
+| **`WALKING`** | Any duration | `NORMAL` | `NONE` | `None` |
+| **`RUNNING`** | Default policy | `NORMAL` | `NONE` | `None` |
+| **`SITTING`** | Any duration | `NORMAL` | `NONE` | `None` |
+| **`BENDING`** | $\le 30.0$s | `NORMAL` | `NONE` | `None` |
+| **`BENDING`** | $> 30.0$s | `POTENTIALLY_UNUSUAL` | `LOW` | `"Prolonged bending"` |
+| **`CROUCHING`** | $\le 30.0$s | `NORMAL` | `NONE` | `None` |
+| **`CROUCHING`** | $> 30.0$s | `POTENTIALLY_UNUSUAL` | `LOW` | `"Prolonged crouching"` |
+| **`LYING`** | $\le 30.0$s (no fall) | `NORMAL` | `NONE` | `None` |
+| **`LYING`** | $> 30.0$s (no fall) | `POTENTIALLY_UNUSUAL` | `LOW` | `"Prolonged lying"` |
+| **`FALLING`** | Any fall detection | `ABNORMAL` | `HIGH` | `"Possible fall detected"` |
+| **`LYING`** | **Following a fall** | `ABNORMAL` | `HIGH` | `"Lying following a fall"` |
+| **`UNKNOWN`** | Low confidence | `UNKNOWN` | `NONE` | `None` |
 
 ---
 
-## 5. Temporal Buffer & Kinematics
+## 📉 Multi-Stage Fall Detection Logic
 
-Each tracked subject maintains an independent rolling temporal buffer (`TrackHistory`):
-- **Timestamp Arithmetic**: $\Delta t = t_i - t_{i-1}$ handles variable FPS and temporary missing frames without FPS drift.
-- **Velocity**: $\text{pixel\_velocity} = \sqrt{\Delta x^2 + \Delta y^2} / \Delta t$.
-- **Vertical Velocity**: $v_y = \Delta y / \Delta t$ (positive downward in image coordinates).
-- **Acceleration**: $a = \Delta v / \Delta t$.
-- **Direction**: $\theta = \text{atan2}(\Delta y, \Delta x)$.
-- **Durations**: Tracks continuous stationary duration and movement duration.
-- **Memory Bounding**: Automatically evicts entries older than `max_seconds` (default 5.0s) and caps frame count.
-- **Stale Track Eviction**: Automatically deletes track histories inactive for $> 2.0$s.
-
-> [!NOTE]
-> **Camera Dependency**: Pixel-based thresholds depend on camera mounting height, focal length, angle, and video resolution. Homography or camera calibration can be applied upstream if metric units (m/s) are needed.
-
----
-
-## 6. Pose Analysis (17-Keypoint COCO Layout)
-
-Supports standard YOLO/COCO keypoints:
-- `torso_angle_deg`: Angle of the midpoint shoulder-to-hip line relative to the vertical axis ($0^\circ$ upright, $90^\circ$ horizontal).
-- `knee_angle_deg`: 3-point angle formed by hip-knee-ankle ($180^\circ$ straight, $< 135^\circ$ seated/crouched).
-- `hip_angle_deg`: 3-point angle formed by shoulder-hip-knee.
-- **Missing Pose Fallback**: If keypoints are `None`, incomplete ($< 17$), or below confidence threshold ($< 0.35$), the system falls back to bounding box aspect ratio and dimensions with a minor confidence discount (`missing_pose_confidence_penalty: 0.15`).
-
----
-
-## 7. Multi-Stage Temporal Fall Detection
-
-A fall is **not** simply detected because a person is lying down (intentional lying is normal). Genuine falls exhibit a distinct multi-stage temporal signature:
+A fall is **never** triggered simply because a person is lying down (intentional resting is normal). Genuine falls exhibit a distinct 4-stage temporal signature:
 
 ```text
 STANDING / WALKING
@@ -256,23 +254,9 @@ $$\text{fall\_score} = 0.35 \cdot s_{\text{vertical}} + 0.25 \cdot s_{\text{post
 
 ---
 
-## 8. Temporal Smoothing & State Machine
+## ⚙️ Configuration Reference (`configs/behavior.yaml`)
 
-1. **Recency-Weighted Majority Smoothing**:
-   $$\text{Weight}(i) = (\text{decay})^{N - 1 - i} \cdot \text{confidence}_i$$
-   Filters out single-frame tracking glitches and noise spikes.
-2. **Transition Hysteresis**:
-   Requires a candidate new activity to sustain for at least `min_duration_seconds` (0.4s) before committing a state transition (except emergency falls which transition immediately).
-3. **Transition Emission**:
-   Emits `ACTIVITY_CHANGE` events strictly on state switches; avoids repetitive noise.
-4. **Prolonged Inactivity Detection**:
-   Emits `PROLONGED_INACTIVITY` when a subject remains stationary beyond `prolonged_inactivity_seconds` (default 60s).
-
----
-
-## 9. Configuration (`configs/behavior.yaml`)
-
-All parameters are externalized in `configs/behavior.yaml`:
+All operational thresholds are externalized in `configs/behavior.yaml`:
 
 ```yaml
 history:
@@ -298,6 +282,11 @@ pose:
   torso_upright_max_deg: 35.0
   torso_horizontal_min_deg: 60.0
   sitting_knee_angle_max: 135.0
+  crouching_knee_angle_max: 115.0
+  crouching_hip_ankle_dy_ratio: 0.35
+  bending_torso_angle_min: 35.0
+  bending_torso_angle_max: 75.0
+  bending_knee_angle_min: 130.0
 
 smoothing:
   window_size: 7
@@ -313,66 +302,76 @@ fall_detection:
   possible_fall_threshold: 0.60
   fall_detected_threshold: 0.82
   cooldown_seconds: 5.0
+
+normality:
+  prolonged_bending_seconds: 30.0
+  prolonged_crouching_seconds: 30.0
+  prolonged_lying_seconds: 30.0
 ```
 
 ---
 
-## 10. Running Tests & Simulations
+## 🧪 Testing & Simulation Commands
 
-### Run Full Test Suite
+### 1. Run Automated Test Suite
 ```bash
 python -m pytest tests/ -v
 ```
-**34 passing tests** verifying:
+**54 passing tests** verifying:
 - Temporal buffer independence, pruning, and timestamp handling
 - Motion kinematics (velocity, acceleration, direction, durations)
 - Pose analyzer geometry and missing-keypoint fallbacks
-- Activity classification rules
+- Activity classification rules (all 8 classes)
 - Temporal smoothing and flicker filtering
 - State machine transitions and inactivity
 - Fall detector temporal sequence validation
-- All 10 mandatory specification scenarios
+- Normality classification rules and fall-lying sequences
+- All 12 end-to-end specification scenarios
 
-### Run Standalone Simulations
+### 2. Run Standalone CLI Simulations
 ```bash
-# 1. Walking simulation
-python examples/simulate_walking.py
+# 1. Normal vs Abnormal behavior showcase
+python examples/simulate_normality.py
 
-# 2. Running simulation
-python examples/simulate_running.py
-
-# 3. Sitting simulation
-python examples/simulate_sitting.py
-
-# 4. Fall detection simulation
+# 2. Fall detection and alert generation
 python examples/simulate_fall.py
 
-# 5. Multi-person concurrent demonstration
+# 3. Individual posture simulations
+python examples/simulate_walking.py
+python examples/simulate_running.py
+python examples/simulate_sitting.py
+python examples/simulate_crouching.py
+python examples/simulate_bending.py
+
+# 4. Multi-person concurrent tracking demonstration
 python examples/demo_behavior_engine.py
+
+# 5. Visual MP4 video generator (renders output/warehouse_simulation.mp4)
+python examples/render_simulation_video.py
 ```
 
 ---
 
-## 11. Integrating with Member 1 (Detector & Tracker)
+## 🤝 Integrating with Member 1 (Detector & Tracker)
 
-Integrating Member 1's YOLOv8/ByteTrack output with this engine takes only a few lines:
+Integrating Member 1's YOLOv8 / ByteTrack pipeline requires only 4 lines of code:
 
 ```python
 from behavior.behavior_engine import BehaviorEngine
 
-# 1. Instantiate engine
+# 1. Initialize engine
 engine = BehaviorEngine("configs/behavior.yaml")
 
-# 2. Inside Member 1's tracking loop:
+# 2. Inside Member 1's per-frame tracking loop:
 for track in tracker.get_active_tracks():
     track_id = track.id
     bbox = track.to_tlbr() # [x1, y1, x2, y2]
-    keypoints = track.keypoints if hasattr(track, "keypoints") else None
+    keypoints = getattr(track, "keypoints", None)
     conf = track.confidence
     timestamp = current_video_time_seconds
 
     # 3. Feed observation into Behavior Engine
-    behavior_result = engine.update(
+    result = engine.update(
         track_id=track_id,
         timestamp=timestamp,
         bbox=bbox,
@@ -380,17 +379,17 @@ for track in tracker.get_active_tracks():
         detection_confidence=conf
     )
 
-    # 4. Access outputs
-    print(f"ID {track_id}: {behavior_result.activity} ({behavior_result.confidence:.2f})")
-    if behavior_result.event:
-        send_alert_to_member_3(behavior_result.event.to_dict())
+    # 4. Access structured behavior and normality output
+    print(f"Person {track_id}: {result.activity} -> {result.status} ({result.severity})")
+    if result.event:
+        send_alert_to_dashboard(result.event.to_dict())
 ```
 
 ---
 
-## 12. Future ML / Deep Learning Integration
+## 🔮 Future ML / Deep Learning Compatibility
 
-The system includes an abstract classifier interface:
+The subsystem provides an abstract interface:
 
 ```python
 class ActivityClassifier(ABC):
@@ -399,7 +398,7 @@ class ActivityClassifier(ABC):
         pass
 ```
 
-To add an LSTM, GRU, or Temporal Convolutional Network (TCN):
+To incorporate an LSTM, GRU, or Temporal Convolutional Network (TCN):
 1. Subclass `ActivityClassifier` (e.g. `LSTMActivityClassifier`).
 2. Pass the classifier instance to `BehaviorEngine(classifier=LSTMActivityClassifier(model_path))`.
-3. The temporal buffers, smoothing, state machine, fall detector, and event handlers remain identical without code alterations.
+3. The temporal buffers, smoothing, state machine, fall detector, normality layer, and event handlers remain unchanged without code modifications.
