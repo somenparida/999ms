@@ -1,4 +1,6 @@
 import io
+import json
+import os
 
 def create_sample_video(client):
     files = {"file": ("sample.mp4", io.BytesIO(b"sample video"), "video/mp4")}
@@ -54,3 +56,48 @@ def test_import_behaviours_member2_format(client):
     event_types = [e["event_type"] for e in events]
     assert "POSSIBLE_FALL" in event_types or "FALLING" in event_types
     assert "BENDING" in event_types
+
+def test_import_real_member2_behaviours_file(client):
+    video_id = create_sample_video(client)
+
+    # Check for behaviours.json at workspace root or mock dir
+    paths_to_check = [
+        "/home/frost/hacknex/behaviours.json",
+        "./mock/behaviours.json",
+        "../behaviours.json"
+    ]
+    file_path = None
+    for p in paths_to_check:
+        if os.path.exists(p):
+            file_path = p
+            break
+
+    assert file_path is not None, "behaviours.json file must exist"
+
+    with open(file_path, "r") as f:
+        payload = json.load(f)
+
+    res = client.post(f"/api/videos/{video_id}/behaviours/import", json=payload)
+    assert res.status_code == 201
+    behaviours = res.json()
+
+    # 69 total behaviour records in Member 2's behaviours.json
+    assert len(behaviours) == 69
+
+    # Check tracks created
+    tracks_res = client.get(f"/api/videos/{video_id}/tracks")
+    assert tracks_res.status_code == 200
+    tracks = tracks_res.json()
+    track_ids = [t["track_id"] for t in tracks]
+    assert 1 in track_ids
+    assert 2 in track_ids
+    assert 3 in track_ids
+    assert 4 in track_ids
+
+    # Check events auto-generated from Member 2's activity transitions
+    events_res = client.get(f"/api/videos/{video_id}/events")
+    assert events_res.status_code == 200
+    events = events_res.json()
+    assert len(events) >= 4
+    event_types = [e["event_type"] for e in events]
+    assert "ACTIVITY_CHANGE" in event_types

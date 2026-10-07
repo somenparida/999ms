@@ -38,8 +38,9 @@ class EventService:
             return existing_event
 
         meta = behaviour.metadata_json or {}
-        explicit_severity = meta.get("severity") or meta.get("event", {}).get("severity")
-        event_type_name = meta.get("event", {}).get("type") or behaviour.behaviour_type
+        explicit_event = meta.get("event") or {}
+        explicit_severity = meta.get("severity") or explicit_event.get("severity")
+        event_type_name = explicit_event.get("type") or behaviour.behaviour_type
 
         severity = EventService.determine_severity(
             behaviour_type=event_type_name,
@@ -47,11 +48,13 @@ class EventService:
             explicit_severity=explicit_severity
         )
 
-        reason_str = behaviour.reason
-        if isinstance(reason_str, list):
-            reason_str = " | ".join(reason_str)
-        if not reason_str:
-            reason_str = f"Abnormal activity '{behaviour.behaviour_type}' detected for Track {behaviour.track_id}"
+        reason_val = behaviour.reason or explicit_event.get("reason")
+        if isinstance(reason_val, list):
+            reason_str = " | ".join(reason_val)
+        elif isinstance(reason_val, str):
+            reason_str = reason_val
+        else:
+            reason_str = f"Behavior activity '{behaviour.behaviour_type}' event detected for Track {behaviour.track_id}"
 
         event = Event(
             video_id=behaviour.video_id,
