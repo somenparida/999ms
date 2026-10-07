@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# YOLO / ML generated files
+runs/
+wandb/
+
+# Test video inputs
+data/input/*.mp4
+data/input/*.avi
+data/input/*.mov
+
+# Generated video outputs
+data/output/*.mp4
+data/output/*.avi
+data/output/*.mov
+
+# OS files
+.DS_Store
+Thumbs.db
