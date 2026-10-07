@@ -1,14 +1,18 @@
 # HNX26PSI07 — Autonomous Vision & Behaviour Understanding
 
-## Backend, PostgreSQL & Integration Subsystem (Member 3)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688.svg?style=for-the-badge&logo=fastapi)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1.svg?style=for-the-badge&logo=postgresql)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg?style=for-the-badge&logo=docker)
+![Pytest](https://img.shields.io/badge/Pytest-9--Passed-46A2F1.svg?style=for-the-badge&logo=pytest)
+![HackNex 2026](https://img.shields.io/badge/HackNex-2026-orange.svg?style=for-the-badge)
 
-Welcome to the central integration repository for **HackNex 2026 — Autonomous Vision & Behaviour Understanding**.
+Welcome to the central integration repository for **HackNex 2026 — Track HNX26PSI07: Autonomous Vision & Behaviour Understanding**.
 
-This repository contains the complete **FastAPI + PostgreSQL + SQLAlchemy + Alembic** backend, event generation engine, evidence manager, multi-laptop networking configuration, test suite, and integration documentation connecting all 4 team members into a single unified platform.
+This repository contains the complete **FastAPI + PostgreSQL + SQLAlchemy + Alembic** backend, event generation engine, explainable evidence manager, multi-laptop networking configuration, automated test suite, and team integration documentation connecting all 4 team members into a single unified platform.
 
 ---
 
-## 📂 Repository Structure
+## 📂 Repository Structure & Overview
 
 ```text
 .
@@ -41,10 +45,10 @@ This repository contains the complete **FastAPI + PostgreSQL + SQLAlchemy + Alem
 
 ## ⚡ Quickstart: Run Backend Server
 
-### 1. Start Server Locally
+### 1. Start Server Locally (Auto-IP Hotspot Mode)
 ```bash
 cd backend
-python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+./start_server.sh
 ```
 - **Interactive Swagger Documentation**: `http://localhost:8000/docs`
 - **Health Check**: `http://localhost:8000/health`
@@ -63,13 +67,21 @@ pytest -v
 
 ---
 
-## 🤝 Team Integration Summary
+## 🤝 Team Member Roles & Integration Matrix
 
-| Team Member | Subsystem Role | API Endpoint / Contract |
+| Team Member | Subsystem Role | Endpoint / Contract |
 | :--- | :--- | :--- |
-| **Member 1** | Object Detection & Tracking | `POST /api/videos/{video_id}/tracks/import` |
-| **Member 2** | Behaviour Intelligence | `POST /api/videos/{video_id}/behaviours/import` |
-| **Member 3** | Backend & Integration Layer | Central FastAPI + PostgreSQL Engine |
-| **Member 4** | Interactive Frontend Dashboard | Base API: `http://<YOUR_IP>:8000/api` |
+| **Member 1** | Object Detection & Tracking (YOLOv8/11 + ByteTrack) | `POST /api/videos/{video_id}/tracks/import` |
+| **Member 2** | Behaviour Intelligence (Posture & Fall Reasoning) | `POST /api/videos/{video_id}/behaviours/import` |
+| **Member 3** | Backend & Integration Layer (FastAPI + PostgreSQL) | Central API Engine (`http://10.89.105.218:8000/api`) |
+| **Member 4** | Interactive Frontend Dashboard UI (React Canvas Overlay) | Base API: `http://10.89.105.218:8000/api` |
 
-For detailed integration instructions, read [README_TEAM_INTEGRATION.md](file:///home/frost/hacknex/README_TEAM_INTEGRATION.md) and [README_MULTI_LAPTOP_CONNECT.md](file:///home/frost/hacknex/README_MULTI_LAPTOP_CONNECT.md).
+---
+
+## 📘 Comprehensive Technical Documentation Links
+
+- 📖 **Backend Architecture & API Specs**: [`backend/README.md`](file:///home/frost/hacknex/backend/README.md)
+- 🤝 **Team Integration Guide**: [`README_TEAM_INTEGRATION.md`](file:///home/frost/hacknex/README_TEAM_INTEGRATION.md)
+- 📱 **Multi-Laptop Networking & Hotspot Guide**: [`README_MULTI_LAPTOP_CONNECT.md`](file:///home/frost/hacknex/README_MULTI_LAPTOP_CONNECT.md)
+- 🖥️ **Member 4 Frontend Dashboard Guide**: [`README_MEMBER_4_FRONTEND.md`](file:///home/frost/hacknex/README_MEMBER_4_FRONTEND.md)
+- 🤖 **Member 4 AI Prompt Guide**: [`backend/MEMBER_4_FRONTEND_PROMPT.md`](file:///home/frost/hacknex/backend/MEMBER_4_FRONTEND_PROMPT.md)
